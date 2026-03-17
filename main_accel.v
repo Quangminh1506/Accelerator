@@ -86,7 +86,7 @@ module main_accel(
     wire [1:0] wbuf0_wstrb, wbuf1_wstrb, wbuf2_wstrb;
 
     //bias sigs
-    wire [7:0] bpbuf0_do, bpbuf1_do, bpbuf2_do;
+        wire [31:0] bpbuf0_do, bpbuf1_do, bpbuf2_do;
     wire bpbuf0_ld, bpbuf1_ld, bpbuf2_ld;
     wire bpbuf0_enb, bpbuf1_enb, bpbuf2_enb;
 
