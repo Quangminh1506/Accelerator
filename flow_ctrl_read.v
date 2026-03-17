@@ -1791,7 +1791,7 @@ module flow_ctrl_read(
                         ibuf_ld = 3'b000;
                         case (read_input_state) 
                             I_BEGIN: begin
-                                pe_matrix_conv_dir = NON;
+                                pe_matrix_conv_dir = NON; // load by column
                                 case (cnt) 
                                     5'd0: begin
                                         idemux = 0;
