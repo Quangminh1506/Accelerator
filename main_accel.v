@@ -23,10 +23,9 @@
 module main_accel(
         input clk,
         input reset,
-        input enb,
 
         input accel_cfgreg_write_enb,
-        input [31:0] accel_Cfgreg_di,
+        input [31:0] accel_cfgreg_di,
         input [4:0] accel_cfg_reg_sel,
 
         input [31:0] accel_read_data,
@@ -86,7 +85,7 @@ module main_accel(
     wire [1:0] wbuf0_wstrb, wbuf1_wstrb, wbuf2_wstrb;
 
     //bias sigs
-        wire [31:0] bpbuf0_do, bpbuf1_do, bpbuf2_do;
+    wire [31:0] bpbuf0_do, bpbuf1_do, bpbuf2_do;
     wire bpbuf0_ld, bpbuf1_ld, bpbuf2_ld;
     wire bpbuf0_enb, bpbuf1_enb, bpbuf2_enb;
 
@@ -160,7 +159,7 @@ module main_accel(
     wire [31:0] kernel3D_size;
 
     wire [31:0] output_mult0, output_mult1, output_mult2;
-    wire [31:0] output_shift0, output_shift1, output_shift2; 
+    wire [7:0] output_shift0, output_shift1, output_shift2; 
     wire [31:0] input_offset, output_offset;
 
     wire accel_write_enb0, accel_write_enb1, accel_write_enb2;
@@ -579,7 +578,7 @@ module main_accel(
         .reset(reset && accel_ctrl_reset),
 
         .config_wen(accel_cfgreg_write_enb),
-        .config_data(accel_Cfgreg_di),
+        .config_data(accel_cfgreg_di),
         .config_sel(accel_cfg_reg_sel),
         .output_quant_buf_outsel(o_quant_sel),
 

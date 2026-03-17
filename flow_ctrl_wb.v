@@ -25,8 +25,8 @@ module flow_ctrl_wb(
         input reset,
         input enb,
 
-        input cfg_layer_type,
-        input out2D_size,
+        input [3:0] cfg_layer_type,
+        input [15:0] out2D_size,
         //element wise unit
         input elw_quant_act_ready,
 
@@ -45,11 +45,11 @@ module flow_ctrl_wb(
         input comp_out_done,
         input [31:0] comp_o_addr,
         input [31:0] comp_ps_addr,
-        input [31:0] comp_o_quant_sel,
+        input [3:0] comp_o_quant_sel,
 
-        output reg elw_quant_act_enb,
-        output reg obuf_enb,
-        output reg obuf_ld,
+        output reg [2:0] elw_quant_act_enb,
+        output reg [2:0] obuf_enb,
+        output reg [2:0] obuf_ld,
         output reg [31:0] mem_write_addr,
         output reg [3:0] mem_wstrb,
         output reg mem_write_enb0,

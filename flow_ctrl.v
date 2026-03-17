@@ -25,7 +25,7 @@ module flow_ctrl(
         input reset,
         input enb,
 
-        input cfg_layer_type,
+        input [3:0] cfg_layer_type,
         input [31:0] i_base_addr,
         input [31:0] o_base_addr,
         input [31:0] bp_base_addr,
@@ -70,7 +70,7 @@ module flow_ctrl(
     //output ctrl sigs
       //read stage
         output [31:0] ctrl_mem_read_addr,
-        output [31:0] ctrl_mem_read_enb,
+        output ctrl_mem_read_enb,
 
         //weight ctrl
         output [2:0] ctrl_wbuf_enb,

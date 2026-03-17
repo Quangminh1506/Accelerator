@@ -99,7 +99,7 @@ module flow_ctrl_read(
         
         //input buffer ctrl
         output reg [2:0] ibuf_conv_wstrb,
-        output reg [2:0] ibuf_dense_wstrb,
+        output reg [1:0] ibuf_dense_wstrb,
         output reg [2:0] ibuf_ld,
         output reg [2:0] ibuf_di_reverse,
         output reg [2:0] ibuf_do_reverse,
@@ -1791,7 +1791,7 @@ module flow_ctrl_read(
                         ibuf_ld = 3'b000;
                         case (read_input_state) 
                             I_BEGIN: begin
-                                pe_matrix_conv_dir = NON; // load by column
+                                pe_matrix_conv_dir = NON;
                                 case (cnt) 
                                     5'd0: begin
                                         idemux = 0;
