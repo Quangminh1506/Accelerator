@@ -64,9 +64,9 @@ module PE_array(
         output valid
     );
     
-    localparam NONE = 2'b00,
-               SHIFT_ROWS = 2'b01,
-               SHIFT_COLUMNS = 2'b10;
+    localparam LEFT = 4'd1,
+               RIGHT = 4'd2,
+               DOWN = 4'd3;
     
     wire [7:0] ireg_to_pe [2:0][2:0]; 
     wire [7:0] wreg_to_pe [2:0][2:0][2:0]; 
@@ -75,7 +75,7 @@ module PE_array(
     wire valid_0, valid_1, valid_2;
     assign valid = valid_0 || valid_1 || valid_2;
     
-    always @* begin
+    always @* begin // [col][row]
         if (pe_arr_is_conv_layer) begin
             ireg_idi[0][0] = pe_arr_idi_0_0; 
             ireg_idi[0][1] = pe_arr_idi_0_1; 
@@ -87,18 +87,7 @@ module PE_array(
             ireg_idi[2][1] = pe_arr_idi_2_1;
             ireg_idi[2][2] = pe_arr_idi_2_2;
                 case (pe_arr_conv_dir)
-                    NONE: begin
-                        ireg_idi[0][0] = pe_arr_idi_0_0;
-                        ireg_idi[0][1] = pe_arr_idi_0_1;
-                        ireg_idi[0][2] = pe_arr_idi_0_2;
-                        ireg_idi[1][0] = pe_arr_idi_1_0;
-                        ireg_idi[1][1] = pe_arr_idi_1_1;
-                        ireg_idi[1][2] = pe_arr_idi_1_2;
-                        ireg_idi[2][0] = pe_arr_idi_2_0;
-                        ireg_idi[2][1] = pe_arr_idi_2_1;
-                        ireg_idi[2][2] = pe_arr_idi_2_2;
-                    end
-                    SHIFT_ROWS: begin 
+                    LEFT: begin 
                         ireg_idi[0][0] = ireg_to_pe[1][0]; 
                         ireg_idi[0][1] = ireg_to_pe[1][1]; 
                         ireg_idi[0][2] = ireg_to_pe[1][2];
@@ -107,15 +96,31 @@ module PE_array(
                         ireg_idi[1][1] = ireg_to_pe[2][1]; 
                         ireg_idi[1][2] = ireg_to_pe[2][2];
 
-                        ireg_idi[2][0] = pe_arr_idi_2_0; 
-                        ireg_idi[2][1] = pe_arr_idi_2_1; 
-                        ireg_idi[2][2] = pe_arr_idi_2_2;
+                        ireg_idi[2][0] = pe_arr_idi_0_0; 
+                        ireg_idi[2][1] = pe_arr_idi_0_1; 
+                        ireg_idi[2][2] = pe_arr_idi_0_2;
                     end
+                
+                    RIGHT: begin
+                        ireg_idi[0][0] = pe_arr_idi_0_0;
+                        ireg_idi[0][1] = pe_arr_idi_0_1;
+                        ireg_idi[0][2] = pe_arr_idi_0_2;
+                        
+                        ireg_idi[1][0] = ireg_idi[0][0];
+                        ireg_idi[1][1] = ireg_idi[0][1];
+                        ireg_idi[1][2] = ireg_idi[0][2];
+                        
+                        ireg_idi[2][0] = ireg_idi[1][0];
+                        ireg_idi[2][1] = ireg_idi[1][1];
+                        ireg_idi[2][2] = ireg_idi[1][2];
+                    end
+
                     
-                    SHIFT_COLUMNS: begin 
+                    DOWN: begin 
                         ireg_idi[0][0] = ireg_to_pe[0][1]; 
                         ireg_idi[0][1] = ireg_to_pe[0][2];
                         ireg_idi[1][0] = ireg_to_pe[1][1]; 
+                        
                         ireg_idi[1][1] = ireg_to_pe[1][2];
                         ireg_idi[2][0] = ireg_to_pe[2][1]; 
                         ireg_idi[2][1] = ireg_to_pe[2][2];

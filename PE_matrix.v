@@ -25,9 +25,9 @@ module PE_matrix(
         input reset,
 
         //Config sigs
-        input          matrix_is_conv_layer,
-        input   [1:0]  matrix_conv_dir,     
-        input   [31:0] matrix_input_offset,       
+        input matrix_is_conv_layer,
+        input [1:0] matrix_conv_dir,     
+        input [31:0] matrix_input_offset,       
         
         //Control sigs
         input   pe_matrix_wreg_enb_0_0_0,

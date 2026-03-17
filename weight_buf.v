@@ -26,7 +26,7 @@ module weight_buf(
         input enb,
         
         input [31:0] wbuf_di,
-        input [1:0] wbuf_sel, wbuf_wrtpos,
+        input [1:0] wbuf_bank_sel, wbuf_wstrb,
         input wbuf_ld, 
         
         output [7:0] wbuf_do_0,
@@ -43,9 +43,9 @@ module weight_buf(
         else begin
             if (enb) begin
                 if (wbuf_ld) begin
-                    case (wbuf_sel)
+                    case (wbuf_bank_sel)
                         2'd1: begin
-                            case (wbuf_wrtpos)
+                            case (wbuf_wstrb)
                                 2'd0: buf_data[31:0] <= wbuf_di[31:0];
                                 2'd1: buf_data[23:0] <= wbuf_di[31:8];
                                 2'd2: buf_data[15:0] <= wbuf_di[31:16];
@@ -54,7 +54,7 @@ module weight_buf(
                         end
 
                         2'd2: begin
-                            case (wbuf_wrtpos)
+                            case (wbuf_wstrb)
                                 2'd0: buf_data[63:32] <= wbuf_di[31:0];
                                 2'd1: buf_data[55:24] <= wbuf_di[31:0];
                                 2'd2: buf_data[47:16] <= wbuf_di[31:0];
@@ -63,7 +63,7 @@ module weight_buf(
                         end
 
                         2'd3: begin
-                            case (wbuf_wrtpos)
+                            case (wbuf_wstrb)
                                 2'd0: buf_data[71:64] <= wbuf_di[7:0];
                                 2'd1: buf_data[71:56] <= wbuf_di[15:0];
                                 2'd2: buf_data[71:48] <= wbuf_di[23:0];

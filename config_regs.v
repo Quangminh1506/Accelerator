@@ -37,17 +37,17 @@ module config_regs (
     output reg [31:0] b_base_addr,
     output reg [31:0] ps_base_addr,
 
-    output reg [3:0] cfg_layer_typ,
-    output reg [3:0] cfg_act_func_typ,
+    output reg [3:0] cfg_layer_type,
+    output reg [3:0] cfg_act_func_type,
 
     output reg [3:0] stride_width,
-    output reg [3:0] stride_height, 
+    output reg [3:0] stride_height,
 
-    output reg [15:0] weight_kernel_patch_width,
-    output reg [15:0] weight_kernel_patch_height,
+    output reg [15:0] weight_kernel_width,
+    output reg [15:0] weight_kernel_height,
 
     output reg [15:0] kernel_ifm_depth,
-    output reg [15:0] nok_ofm_depth,
+    output reg [15:0] out_total_kernel_ofm_depth,
 
     output reg [15:0] ifm_width,
     output reg [15:0] ifm_height,
@@ -76,7 +76,7 @@ module config_regs (
 
     reg [5:0] output_quant_buf_insel;
 
-    reg [31:0] output_multiplier_buf[36-1: 0];
+    reg [31:0] output_multiplier_buf[36-1:0];
 
     reg [7:0] output_shift_buf[36-1:0];
 
@@ -88,14 +88,14 @@ module config_regs (
             o_base_addr <= 0;
             b_base_addr <= 0;
             ps_base_addr <= 0;
-            cfg_layer_typ <= 0; 
-            cfg_act_func_typ <= 0;
+            cfg_layer_type <= 0; 
+            cfg_act_func_type <= 0;
             stride_width <= 0;
             stride_height <= 0;
-            weight_kernel_patch_width <= 0;
-            weight_kernel_patch_height <= 0;
+            weight_kernel_width <= 0;
+            weight_kernel_height <= 0;
             kernel_ifm_depth <= 0;
-            nok_ofm_depth <= 0;
+            out_total_kernel_ofm_depth <= 0;
             ifm_width <= 0;
             ifm_height <= 0;
             ofm_width <= 0;
@@ -121,9 +121,9 @@ module config_regs (
                 5'd3: b_base_addr <= config_data;
                 5'd4: ps_base_addr <= config_data;
                 //layer topo
-                5'd5: {stride_height, stride_width, cfg_act_func_typ, cfg_layer_typ} <= config_data[15:0];
-                5'd6: {weight_kernel_patch_height, weight_kernel_patch_width} <= config_data;
-                5'd7: {nok_ofm_depth, kernel_ifm_depth} <= config_data;
+                5'd5: {stride_height, stride_width, cfg_act_func_type, cfg_layer_type} <= config_data[15:0];
+                5'd6: {weight_kernel_height, weight_kernel_width} <= config_data;
+                5'd7: {out_total_kernel_ofm_depth, kernel_ifm_depth} <= config_data;
                 5'd8: {ifm_height, ifm_width} <= config_data;
                 5'd9: {ofm_height, ofm_width} <= config_data;
                 5'd10: {output2D_size, input2D_size} <= config_data;

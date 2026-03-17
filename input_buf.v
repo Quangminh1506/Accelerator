@@ -25,7 +25,7 @@ module input_buf(
         input reset,
         input enb,
         
-        input [3:0] cfg_layer_typ,
+        input [3:0] cfg_layer_type,
         input [1:0] ibuf_dense_wstrb,
         input [2:0] ibuf_conv_wstrb,
         
@@ -39,7 +39,6 @@ module input_buf(
         input ibuf_conv_se_load,
 
         input [31:0] ibuf_di,
-        input [7:0] ibuf_init,
 
         output reg [7:0] ibuf_do_0,
         output reg [7:0] ibuf_do_1,
@@ -74,7 +73,7 @@ module input_buf(
         end
         else if (enb) begin
             if (ibuf_ld) begin
-                case (cfg_layer_typ) 
+                case (cfg_layer_type) 
                 CONV, POOLING: begin
                     case (ibuf_bank_sel) 
                         2'd1: begin
@@ -293,7 +292,7 @@ module input_buf(
         end
         
         else begin
-            case (cfg_layer_typ)
+            case (cfg_layer_type)
                 CONV: begin 
                     if (ibuf_conv_se_load) begin
                         if (ibuf_conv_fi_load) begin
@@ -361,28 +360,28 @@ module input_buf(
 
                 DENSE: begin
                     buf_b0_data[15: 0] <= buf_b0_data[23: 8];
-                    buf_b0_data[23:16] <= ibuf_init; 
+                    buf_b0_data[23:16] <= 0; 
 
                     buf_b1_data[15: 0] <= buf_b1_data[23: 8];
-                    buf_b1_data[23:16] <= ibuf_init; 
+                    buf_b1_data[23:16] <= 0; 
 
                     buf_b2_data[15: 0] <= buf_b2_data[23: 8];
-                    buf_b2_data[23:16] <= ibuf_init; 
+                    buf_b2_data[23:16] <= 0; 
                 end
 
                 POOLING: begin
                     buf_b0_data[39:0] <= buf_b0_data[47:8];
-                    buf_b0_data[47:40] <= ibuf_init;
+                    buf_b0_data[47:40] <= 0;
                     buf_b0_valid[4:0] <= buf_b0_valid[5:1];
                     buf_b0_valid[5] <= 0;
 
                     buf_b1_data[39:0] <= buf_b1_data[47:8];
-                    buf_b1_data[47:40] <= ibuf_init;
+                    buf_b1_data[47:40] <= 0;
                     buf_b1_valid[4:0] <= buf_b1_valid[5:1];
                     buf_b1_valid[5] <= 0;
 
                     buf_b2_data[39:0] <= buf_b2_data[47:8];
-                    buf_b2_data[47:40] <= ibuf_init;
+                    buf_b2_data[47:40] <= 0;
                     buf_b2_valid[4:0] <= buf_b2_valid[5:1];
                     buf_b2_valid[5] <= 0;
                 end
@@ -396,7 +395,7 @@ module input_buf(
         ibuf_do_2 = 0;
         ibuf_valid = 0;
         ibuf_nxt_valid  = 0;
-        case (cfg_layer_typ)
+        case (cfg_layer_type)
             CONV: begin 
                 if (ibuf_conv_se_load || ibuf_conv_fi_load) begin
                     if (ibuf_do_reverse) begin
