@@ -82,7 +82,7 @@ module elw_unit(
                 lut_to_quant_2_6, lut_to_quant_2_7, lut_to_quant_2_8, lut_to_quant_2_9, lut_to_quant_2_10,
                 lut_to_quant_2_11, lut_to_quant_2_12, lut_to_quant_2_13, lut_to_quant_2_14, lut_to_quant_2_15;
     
-    //Quantilize
+    //Quantization
     // first
     quant_lut  quant_lut_0 (
         .quant_muler    (elew_quant_muler_0),
