@@ -65,7 +65,7 @@ module flow_ctrl(
         input ctrl_pe_matrix_ready,
 
         //write back stage
-        input ctrl_elw_quant_act_ready,
+        input [2:0] ctrl_elw_quant_act_ready,
 
     //output ctrl sigs
       //read stage

@@ -92,7 +92,7 @@ module flow_ctrl_comp(
                         end
 
                         GL_WAIT: begin
-                            if ((read_done || read_ready) && (wb_ready && wb_start) && comp_ready) begin
+                            if ((read_done || read_ready) && (wb_ready || wb_start) && comp_ready) begin
                                 if (read_done) comp_g_state <= GL_DONE;
                                 else begin
                                     comp_g_state <= GL_MAC;

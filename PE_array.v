@@ -61,7 +61,7 @@ module PE_array(
         output [31:0] pe_arr_odo_1_0, pe_arr_odo_1_1, pe_arr_odo_1_2,
         output [31:0] pe_arr_odo_2_0, pe_arr_odo_2_1, pe_arr_odo_2_2,
         
-        output valid
+        output ready
     );
     
     localparam LEFT = 4'd1,
@@ -72,8 +72,8 @@ module PE_array(
     wire [7:0] wreg_to_pe [2:0][2:0][2:0]; 
     reg  [7:0] ireg_idi   [2:0][2:0];
     
-    wire valid_0, valid_1, valid_2;
-    assign valid = valid_0 || valid_1 || valid_2;
+    wire ready_0, ready_1, ready_2;
+    assign ready = ready_0 || ready_1 || ready_2;
     
     always @* begin // [col][row]
         if (pe_arr_is_conv_layer) begin
@@ -324,7 +324,7 @@ module PE_array(
         .pe_odo_0(pe_arr_odo_0_0), 
         .pe_odo_1(pe_arr_odo_0_1), 
         .pe_odo_2(pe_arr_odo_0_2),
-        .valid(valid_0)
+        .ready(ready_0)
     );
     
     PE_unit pe_1 (
@@ -347,7 +347,7 @@ module PE_array(
         .pe_odo_0(pe_arr_odo_1_0), 
         .pe_odo_1(pe_arr_odo_1_1), 
         .pe_odo_2(pe_arr_odo_1_2),
-        .valid(valid_1)
+        .ready(ready_1)
     );
     
     PE_unit pe_2(
@@ -370,7 +370,7 @@ module PE_array(
         .pe_odo_0(pe_arr_odo_2_0), 
         .pe_odo_1(pe_arr_odo_2_1), 
         .pe_odo_2(pe_arr_odo_2_2),
-        .valid(valid_2)
+        .ready(ready_2)
     );
     
 endmodule

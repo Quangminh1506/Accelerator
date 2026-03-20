@@ -29,9 +29,8 @@ module accel_mac(
     input [7:0] idi_0, idi_1, idi_2,
     input [7:0] wdi_0, wdi_1, wdi_2,
 
-    output reg valid,
-    output ready,
-    output reg [31:0] mac_odo    
+    output reg ready,
+    output reg [31:0] mac_odo
 );
 
     reg [7:0] mux_idi;
@@ -43,37 +42,48 @@ module accel_mac(
                MAC1 = 2'd2,
                MAC2 = 2'd3;
     
-    assign ready = (state == IDLE);
-    
     always @(*) begin
         case(state)
             MAC0: begin 
                 mux_idi = idi_0; 
                 mux_wdi = wdi_0; 
+                ready = 0;
             end 
             MAC1: begin
                 mux_idi = idi_1; 
                 mux_wdi = wdi_1; 
+                ready = 0;
             end 
             MAC2: begin 
                 mux_idi = idi_2; 
                 mux_wdi = wdi_2; 
+                ready = 1;
             end 
             default: begin 
                 mux_idi = idi_0; 
                 mux_wdi = wdi_0; 
+                ready = 0;
             end
         endcase
     end
 
-    wire [7:0] idi_off = mux_idi + input_offset[7:0];
-    wire [15:0] prod;
+    wire signed [9:0] idi_add_off = $signed(mux_idi) + $signed(input_offset[8:0]);
+
+    wire idi_sign = idi_add_off[9];
+    wire wdi_sign = mux_wdi[7];
+
+    wire [8:0] us_idi_9b = idi_sign ? -$signed(idi_add_off) : idi_add_off;
+    wire [7:0] us_idi    = us_idi_9b[7:0]; // Chỉ lấy 8 bit đưa vào bộ nhân
+    wire [7:0] us_wdi    = wdi_sign ? (~mux_wdi + 1'b1) : mux_wdi;
     
     M8_CP13_2 mult (
-        .A(idi_off), 
-        .B(mux_wdi), 
+        .A(us_idi),
+        .B(us_wdi),
         .P(prod)
     );
+
+    wire prod_sign = idi_sign ^ wdi_sign;
+    wire signed [31:0] final_prod = prod_sign ? -$signed({16'd0, prod}) : $signed({16'd0, prod});
 
     reg [31:0] acc;
     
@@ -82,30 +92,25 @@ module accel_mac(
             state <= IDLE;
             acc <= 32'd0;
             mac_odo <= 32'd0;
-            valid <= 1'b0;
-        end else begin
+        end else if (enb) begin
             case (state)
                 IDLE: begin
-                    valid <= 1'b0;
-                    if (enb) begin 
-                        state <= MAC0;
-                    end
+                    state <= MAC0;
                 end
                 
                 MAC0: begin
-                    acc <= prod; 
+                    acc <= final_prod;
                     state <= MAC1;
                 end
                 
                 MAC1: begin
-                    acc <= acc + prod; 
+                    acc <= acc + final_prod;
                     state <= MAC2;
                 end
                 
                 MAC2: begin
-                    mac_odo <= acc + prod; 
-                    valid <= 1'b1;         
-                    state <= IDLE;         
+                    mac_odo <= acc + final_prod;
+                    state <= IDLE;
                 end
             endcase
         end

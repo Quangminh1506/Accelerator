@@ -134,7 +134,7 @@ module flow_ctrl_read(
     wire [31:0] i_addr1_0 = i_addr0_0 + in2D_size;
     wire [31:0] i_addr1_1 = i_addr1_0 + w_ifm;
     wire [31:0] i_addr1_2 = i_addr1_1 + w_ifm;
-    wire [31:0] i_addr2_0 = i_addr2_0 + in2D_size;
+    wire [31:0] i_addr2_0 = i_addr1_0 + in2D_size;
     wire [31:0] i_addr2_1 = i_addr2_0 + w_ifm;
     wire [31:0] i_addr2_2 = i_addr2_1 + w_ifm;
 
@@ -437,7 +437,7 @@ module flow_ctrl_read(
                         
                         GL_WAIT: begin
                             if (read_ready && (comp_ready || comp_start) && (wb_ready || wb_start)) begin
-                                if (read_input_state == I_LEFT_DONE && read_input_state == I_RIGHT_DONE) begin
+                                if (read_input_state == I_LEFT_DONE || read_input_state == I_RIGHT_DONE) begin
                                     read_input_state <= I_BEGIN;
                                     if (z_kw_in + 3 >= kernel_ifm_depth && z_kw_num_out + 3 >=  out_total_kernel_ofm_depth ) begin
                                         read_g_state <= GL_DONE;
@@ -785,7 +785,7 @@ module flow_ctrl_read(
                                         if (is_out_done && stride_cnt >= h_stride - 1) begin
                                             o_addr0 <= o_addr0 - 1;
                                         end
-                                        stride_cnt <= stride_cnt - 1;
+                                        stride_cnt <= 0;
                                     end
                                     else begin
                                         stride_cnt <= stride_cnt + 1;
@@ -810,7 +810,7 @@ module flow_ctrl_read(
                         
                         GL_WAIT: begin
                             if (read_ready && (comp_ready || comp_start) && (wb_ready || wb_start)) begin
-                                if (read_input_state == I_LEFT_DONE && read_input_state == I_RIGHT_DONE) begin
+                                if (read_input_state == I_LEFT_DONE || read_input_state == I_RIGHT_DONE) begin
                                     x_in <= 0;
                                     y_in <= 0;
                                     x_out <= 0;
@@ -1041,7 +1041,6 @@ module flow_ctrl_read(
                 case (read_g_state) 
                     GL_WREAD: begin
                         mem_read_enb = 1;
-                        if (mem_read_state) begin
                             case (cnt) 
                                 4'd0: begin
                                    case (read_weight_state)
@@ -1115,7 +1114,8 @@ module flow_ctrl_read(
                                    endcase
                                 end
                             endcase
-                            
+
+                        if (mem_read_state) begin                            
                             if (mem_read_ready) begin
                                 mem_read_enb = 0;
                                 case (cnt) 
@@ -1326,6 +1326,81 @@ module flow_ctrl_read(
                     
                     GL_IREAD: begin
                         mem_read_enb = 1;
+                        case (mem_read_state)
+                            I_BEGIN: begin
+                                case (cnt)
+                                    5'd0: mem_read_addr = i_addr0_0;
+                                    5'd1: mem_read_addr = i_addr0_0 + 4;
+                                    5'd2: mem_read_addr = i_addr0_1;
+                                    5'd3: mem_read_addr = i_addr0_1 + 4;
+                                    5'd4: mem_read_addr = i_addr0_2;
+                                    5'd5: mem_read_addr = i_addr0_2 + 4;
+                                    5'd6: mem_read_addr = i_addr1_0;
+                                    5'd7: mem_read_addr = i_addr1_0 + 4;
+                                    5'd8: mem_read_addr = i_addr1_1;
+                                    5'd9: mem_read_addr = i_addr1_1 + 4;
+                                    5'd10: mem_read_addr = i_addr1_2;
+                                    5'd11: mem_read_addr = i_addr1_2 + 4;
+                                    5'd12: mem_read_addr = i_addr2_0;
+                                    5'd13: mem_read_addr = i_addr2_0 + 4;
+                                    5'd14: mem_read_addr = i_addr2_1;
+                                    5'd15: mem_read_addr = i_addr2_1 + 4;
+                                    5'd16: mem_read_addr = i_addr2_2;
+                                    5'd17: mem_read_addr = i_addr2_2 + 4;
+                                endcase
+                            end
+                                
+                            I_LEFT: begin
+                                case (cnt) 
+                                    5'd0: mem_read_addr = i_sl_addr0_0;
+                                    5'd1: mem_read_addr = i_sl_addr0_1;
+                                    5'd2: mem_read_addr = i_sl_addr0_2;
+                                    5'd3: mem_read_addr = i_sl_addr1_0;
+                                    5'd4: mem_read_addr = i_sl_addr1_1;
+                                    5'd5: mem_read_addr = i_sl_addr1_2;
+                                    5'd6: mem_read_addr = i_sl_addr2_0;
+                                    5'd7: mem_read_addr = i_sl_addr2_1;
+                                    5'd8: mem_read_addr = i_sl_addr2_2;
+                                endcase
+                            end
+                                
+                            I_DOWN_LEFT_RIGHT: begin
+                                case (cnt)
+                                    5'd0: mem_read_addr = i_sdlr_addr0;
+                                    5'd1: mem_read_addr = i_sdlr_addr0 + 4;
+                                    5'd2: mem_read_addr = i_sdlr_addr1;
+                                    5'd3: mem_read_addr = i_sdlr_addr1 + 4;
+                                    5'd4: mem_read_addr = i_sdlr_addr2;
+                                    5'd5: mem_read_addr = i_sdlr_addr2 + 4;
+                                endcase
+                            end
+                                
+                            I_RIGHT: begin
+                                case (cnt) 
+                                    5'd0: mem_read_addr = i_sr_addr0_0;
+                                    5'd1: mem_read_addr = i_sr_addr0_1;
+                                    5'd2: mem_read_addr = i_sr_addr0_2;
+                                    5'd3: mem_read_addr = i_sr_addr1_0;
+                                    5'd4: mem_read_addr = i_sr_addr1_1;
+                                    5'd5: mem_read_addr = i_sr_addr1_2;
+                                    5'd6: mem_read_addr = i_sr_addr2_0;
+                                    5'd7: mem_read_addr = i_sr_addr2_1;
+                                    5'd8: mem_read_addr = i_sr_addr2_2;
+                                endcase
+                            end
+                                
+                            I_DOWN_RIGHT_LEFT: begin
+                                case (cnt)
+                                    5'd0: mem_read_addr = i_sdrl_addr0;
+                                    5'd1: mem_read_addr = i_sdrl_addr0 - 4;
+                                    5'd2: mem_read_addr = i_sdrl_addr1;
+                                    5'd3: mem_read_addr = i_sdrl_addr1 - 4;
+                                    5'd4: mem_read_addr = i_sdrl_addr2;
+                                    5'd5: mem_read_addr = i_sdrl_addr2 - 4;
+                                endcase
+                            end
+                        endcase
+
                         if (mem_read_state) begin
                             if (mem_read_ready) begin
                                 mem_read_enb = 0;
@@ -1336,7 +1411,7 @@ module flow_ctrl_read(
                                                 ibuf_enb[0] = 1;
                                                 ibuf_ld[0] = 1;
                                                 ibuf_bank_sel[1:0] = 1;
-                                                ibuf_conv_wstrb = {1'b0, i_addr0_0[1:0]};    
+                                                ibuf_conv_wstrb = {1'b0, i_addr0_0[1:0]};
                                             end
                                             
                                             5'd1: begin
@@ -1709,80 +1784,6 @@ module flow_ctrl_read(
                                     end                                
                                 endcase
                             end
-                            case (mem_read_state)
-                                I_BEGIN: begin
-                                    case (cnt)
-                                        5'd0: mem_read_addr = i_addr0_0;
-                                        5'd1: mem_read_addr = i_addr0_0 + 4;
-                                        5'd2: mem_read_addr = i_addr0_1;
-                                        5'd3: mem_read_addr = i_addr0_1 + 4;
-                                        5'd4: mem_read_addr = i_addr0_2;
-                                        5'd5: mem_read_addr = i_addr0_2 + 4;
-                                        5'd6: mem_read_addr = i_addr1_0;
-                                        5'd7: mem_read_addr = i_addr1_0 + 4;
-                                        5'd8: mem_read_addr = i_addr1_1;
-                                        5'd9: mem_read_addr = i_addr1_1 + 4;
-                                        5'd10: mem_read_addr = i_addr1_2;
-                                        5'd11: mem_read_addr = i_addr1_2 + 4;
-                                        5'd12: mem_read_addr = i_addr2_0;
-                                        5'd13: mem_read_addr = i_addr2_0 + 4;
-                                        5'd14: mem_read_addr = i_addr2_1;
-                                        5'd15: mem_read_addr = i_addr2_1 + 4;
-                                        5'd16: mem_read_addr = i_addr2_2;
-                                        5'd17: mem_read_addr = i_addr2_2 + 4;
-                                    endcase
-                                end
-                                
-                                I_LEFT: begin
-                                    case (cnt) 
-                                        5'd0: mem_read_addr = i_sl_addr0_0;
-                                        5'd1: mem_read_addr = i_sl_addr0_1;
-                                        5'd2: mem_read_addr = i_sl_addr0_2;
-                                        5'd3: mem_read_addr = i_sl_addr1_0;
-                                        5'd4: mem_read_addr = i_sl_addr1_1;
-                                        5'd5: mem_read_addr = i_sl_addr1_2;
-                                        5'd6: mem_read_addr = i_sl_addr2_0;
-                                        5'd7: mem_read_addr = i_sl_addr2_1;
-                                        5'd8: mem_read_addr = i_sl_addr2_2;
-                                    endcase
-                                end
-                                
-                                I_DOWN_LEFT_RIGHT: begin
-                                    case (cnt)
-                                        5'd0: mem_read_addr = i_sdlr_addr0;
-                                        5'd1: mem_read_addr = i_sdlr_addr0 + 4;
-                                        5'd2: mem_read_addr = i_sdlr_addr1;
-                                        5'd3: mem_read_addr = i_sdlr_addr1 + 4;
-                                        5'd4: mem_read_addr = i_sdlr_addr2;
-                                        5'd5: mem_read_addr = i_sdlr_addr2 + 4;
-                                    endcase
-                                end
-                                
-                                I_RIGHT: begin
-                                    case (cnt) 
-                                        5'd0: mem_read_addr = i_sr_addr0_0;
-                                        5'd1: mem_read_addr = i_sr_addr0_1;
-                                        5'd2: mem_read_addr = i_sr_addr0_2;
-                                        5'd3: mem_read_addr = i_sr_addr1_0;
-                                        5'd4: mem_read_addr = i_sr_addr1_1;
-                                        5'd5: mem_read_addr = i_sr_addr1_2;
-                                        5'd6: mem_read_addr = i_sr_addr2_0;
-                                        5'd7: mem_read_addr = i_sr_addr2_1;
-                                        5'd8: mem_read_addr = i_sr_addr2_2;
-                                    endcase
-                                end
-                                
-                                I_DOWN_RIGHT_LEFT: begin
-                                    case (cnt)
-                                        5'd0: mem_read_addr = i_sdrl_addr0;
-                                        5'd1: mem_read_addr = i_sdrl_addr0 - 4;
-                                        5'd2: mem_read_addr = i_sdrl_addr1;
-                                        5'd3: mem_read_addr = i_sdrl_addr1 - 4;
-                                        5'd4: mem_read_addr = i_sdrl_addr2;
-                                        5'd5: mem_read_addr = i_sdrl_addr2 - 4;
-                                    endcase
-                                end
-                            endcase
                         end
                     end
                     
@@ -1859,6 +1860,7 @@ module flow_ctrl_read(
                         endcase
                         if (mem_read_state) begin
                             if (mem_read_ready) begin
+                                mem_read_enb = 0;
                                 case (cnt) 
                                     5'd0: begin
                                         ibuf_enb[0] = 1;
@@ -2043,6 +2045,7 @@ module flow_ctrl_read(
                         endcase
                         if (mem_read_state) begin
                             if (mem_read_ready) begin
+                                mem_read_enb = 0;
                                 case (cnt)
                                     4'd0: begin
                                         wbuf_enb[0] = 1;
@@ -2364,7 +2367,7 @@ module flow_ctrl_read(
             read_o_quant_sel <= 0;
         end
         else begin
-            if (read_ready && (comp_ready || comp_start) || (wb_ready || wb_start) && enb) begin
+            if (read_ready && (comp_ready || comp_start) && (wb_ready || wb_start) && enb) begin
                 read_out_done <= is_out_done;
                 read_ps_addr <= process_ps_addr;
                 read_o_addr <= process_o_addr;

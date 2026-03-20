@@ -28,7 +28,7 @@ module PE_unit
         input [31:0] pe_input_offset,
         input [7:0] pe_wdi_0_0, pe_wdi_0_1, pe_wdi_0_2, pe_wdi_1_0, pe_wdi_1_1, pe_wdi_1_2, pe_wdi_2_0, pe_wdi_2_1, pe_wdi_2_2,
         input [7:0] pe_idi_0, pe_idi_1, pe_idi_2,
-        output valid,
+        output ready,
         output [31:0] pe_odo_0, pe_odo_1, pe_odo_2
     );
 
@@ -36,10 +36,9 @@ module PE_unit
     wire [7:0] lpereg_1 [2:0];
     wire [7:0] lpereg_2 [2:0];
     
-    wire valid_0, valid_1, valid_2;
     wire ready_0, ready_1, ready_2;
     
-    assign valid = valid_0 & valid_1 & valid_2;
+    assign ready = ready_0 || ready_1 || ready_2;
     // inst 0
     accel_lpe_reg lpe_0 (
         .clk (clk),
@@ -65,7 +64,6 @@ module PE_unit
         .wdi_0 (lpereg_0[0]),
         .wdi_1 (lpereg_0[1]),
         .wdi_2 (lpereg_0[2]),
-        .valid (valid_0),
         .ready (ready_0),
         .mac_odo (pe_odo_0)
     );
@@ -95,7 +93,6 @@ module PE_unit
         .wdi_0 (lpereg_1[0]),
         .wdi_1 (lpereg_1[1]),
         .wdi_2 (lpereg_1[2]),
-        .valid (valid_1),
         .ready (ready_1),
         .mac_odo (pe_odo_1)
     );
@@ -125,7 +122,6 @@ module PE_unit
         .wdi_0 (lpereg_2[0]),
         .wdi_1 (lpereg_2[1]),
         .wdi_2 (lpereg_2[2]),
-        .valid (valid_2),
         .ready (ready_2),
         .mac_odo (pe_odo_2)
     );

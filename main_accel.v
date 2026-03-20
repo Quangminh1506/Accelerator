@@ -49,7 +49,6 @@ module main_accel(
                POOLING = 4'd1,
                DENSE = 4'd2;
 
-    wire is_conv_layer;
     wire [3:0] o_quant_sel;
     wire flow_ctrl_out_done;
 
@@ -448,7 +447,7 @@ module main_accel(
         .pe_matrix_odo_2_2_1(pe_matrix_odo2_2_1),
         .pe_matrix_odo_2_2_2(pe_matrix_odo2_2_2),
 
-        .valid(pe_matrix_ready)
+        .ready(pe_matrix_ready)
     );
 
     //accumulate matrix
@@ -624,51 +623,54 @@ module main_accel(
 
     wire [2:0] ctrl_wbuf_enb, ctrl_wbuf_ld;
     wire [5:0] ctrl_wbuf_wstrb, ctrl_wbuf_bank_sel;
-    assign ctrl_wbuf_enb = {wbuf2_enb, wbuf1_enb, wbuf0_enb};
-    assign ctrl_wbuf_ld = {wbuf2_ld, wbuf1_ld, wbuf0_ld};
-    assign ctrl_wbuf_wstrb = {wbuf2_wstrb, wbuf1_wstrb, wbuf0_wstrb};
-    assign ctrl_wbuf_bank_sel = {wbuf2_bank_sel, wbuf1_bank_sel, wbuf0_bank_sel};
+    assign {wbuf2_enb, wbuf1_enb, wbuf0_enb} = ctrl_wbuf_enb ;
+    assign {wbuf2_ld, wbuf1_ld, wbuf0_ld} = ctrl_wbuf_ld;
+    assign {wbuf2_wstrb, wbuf1_wstrb, wbuf0_wstrb} = ctrl_wbuf_wstrb;
+    assign {wbuf2_bank_sel, wbuf1_bank_sel, wbuf0_bank_sel} = ctrl_wbuf_bank_sel;
 
     wire [2:0] ctrl_ibuf_enb, ctrl_ibuf_ld;
     wire [2:0] ctrl_ibuf_di_reverse, ctrl_ibuf_do_reverse;
     wire [5:0] ctrl_ibuf_bank_sel;
-    assign ctrl_ibuf_enb = {ibuf2_enb, ibuf1_enb, ibuf0_enb};
-    assign ctrl_ibuf_ld = {ibuf2_ld, ibuf1_ld, ibuf0_ld};
-    assign ctrl_ibuf_di_reverse = {ibuf2_di_reverse, ibuf1_di_reverse, ibuf0_di_reverse};
-    assign ctrl_ibuf_do_reverse = {ibuf2_do_reverse, ibuf1_do_reverse, ibuf0_do_reverse};
-    assign ctrl_ibuf_bank_sel = {ibuf2_bank_sel, ibuf1_bank_sel, ibuf0_bank_sel};
+    assign {ibuf2_enb, ibuf1_enb, ibuf0_enb} = ctrl_ibuf_enb;
+    assign {ibuf2_ld, ibuf1_ld, ibuf0_ld} = ctrl_ibuf_ld;
+    assign {ibuf2_di_reverse, ibuf1_di_reverse, ibuf0_di_reverse} = ctrl_ibuf_di_reverse;
+    assign {ibuf2_do_reverse, ibuf1_do_reverse, ibuf0_do_reverse} = ctrl_ibuf_do_reverse;
+    assign {ibuf2_bank_sel, ibuf1_bank_sel, ibuf0_bank_sel} = ctrl_ibuf_bank_sel;
     
     wire [2:0] ctrl_bpbuf_enb, ctrl_bpbuf_ld;
-    assign ctrl_bpbuf_enb = {bpbuf2_enb, bpbuf1_enb, bpbuf0_enb};
-    assign ctrl_bpbuf_ld = {bpbuf2_ld, bpbuf1_ld, bpbuf0_ld};
+    assign {bpbuf2_enb, bpbuf1_enb, bpbuf0_enb} = ctrl_bpbuf_enb;
+    assign {bpbuf2_ld, bpbuf1_ld, bpbuf0_ld} = ctrl_bpbuf_ld;
 
     wire [8:0] ctrl_ireg_enb;
-    assign ctrl_ireg_enb = {ireg_enb2_2, ireg_enb2_1, ireg_enb2_0,
-                            ireg_enb1_2, ireg_enb1_1, ireg_enb1_0,
-                            ireg_enb0_2, ireg_enb0_1, ireg_enb0_0};
+    assign {ireg_enb2_2, ireg_enb2_1, ireg_enb2_0,
+            ireg_enb1_2, ireg_enb1_1, ireg_enb1_0,
+            ireg_enb0_2, ireg_enb0_1, ireg_enb0_0} = ctrl_ireg_enb;
 
     wire [26:0] ctrl_wreg_enb;
-    assign ctrl_wreg_enb = {wreg_enb2_2_2, wreg_enb2_2_1, wreg_enb2_2_0,
-                            wreg_enb2_1_2, wreg_enb2_1_1, wreg_enb2_1_0,
-                            wreg_enb2_0_2, wreg_enb2_0_1, wreg_enb2_0_0,
-                            wreg_enb1_2_2, wreg_enb1_2_1, wreg_enb1_2_0,
-                            wreg_enb1_1_2, wreg_enb1_1_1, wreg_enb1_1_0,
-                            wreg_enb1_0_2, wreg_enb1_0_1, wreg_enb1_0_0,
-                            wreg_enb0_2_2, wreg_enb0_2_1, wreg_enb0_2_0,
-                            wreg_enb0_1_2, wreg_enb0_1_1, wreg_enb0_1_0,
-                            wreg_enb0_0_2, wreg_enb0_0_1, wreg_enb0_0_0};
+    assign {wreg_enb2_2_2, wreg_enb2_2_1, wreg_enb2_2_0,
+            wreg_enb2_1_2, wreg_enb2_1_1, wreg_enb2_1_0,
+            wreg_enb2_0_2, wreg_enb2_0_1, wreg_enb2_0_0,
+            wreg_enb1_2_2, wreg_enb1_2_1, wreg_enb1_2_0,
+            wreg_enb1_1_2, wreg_enb1_1_1, wreg_enb1_1_0,
+            wreg_enb1_0_2, wreg_enb1_0_1, wreg_enb1_0_0,
+            wreg_enb0_2_2, wreg_enb0_2_1, wreg_enb0_2_0,
+            wreg_enb0_1_2, wreg_enb0_1_1, wreg_enb0_1_0,
+            wreg_enb0_0_2, wreg_enb0_0_1, wreg_enb0_0_0} = ctrl_wreg_enb;
 
     wire [8:0] ctrl_pe_enb;
-    assign ctrl_ireg_enb = {pe_enb2_2, pe_enb2_1, pe_enb2_0,
-                            pe_enb1_2, pe_enb1_1, pe_enb1_0,
-                            pe_enb0_2, pe_enb0_1, pe_enb0_0};
+    assign {pe_enb2_2, pe_enb2_1, pe_enb2_0,
+            pe_enb1_2, pe_enb1_1, pe_enb1_0,
+            pe_enb0_2, pe_enb0_1, pe_enb0_0} = ctrl_pe_enb;
 
     wire [2:0] ctrl_elw_quant_act_enb;
-    assign ctrl_elw_quant_act_enb = {quant_act_func_enb2, quant_act_func_enb1, quant_act_func_enb0};
+    assign {quant_act_func_enb2, quant_act_func_enb1, quant_act_func_enb0} = ctrl_elw_quant_act_enb;
+
+    wire [2:0] ctrl_elw_quant_act_ready;
+    assign ctrl_elw_quant_act_ready = {quant_act_func_ready2, quant_act_func_ready1, quant_act_func_ready0} ;
 
     wire [2:0] ctrl_obuf_enb, ctrl_obuf_ld;
-    assign ctrl_obuf_enb = {obuf2_enb, obuf1_enb, obuf0_enb};
-    assign ctrl_obuf_ld = {obuf2_ld, obuf1_ld, obuf0_ld};
+    assign {obuf2_enb, obuf1_enb, obuf0_enb} = ctrl_obuf_enb;
+    assign {obuf2_ld, obuf1_ld, obuf0_ld} = ctrl_obuf_ld;
 
     flow_ctrl flow_ctrl(
         .clk(clk),
@@ -711,7 +713,7 @@ module main_accel(
         .ctrl_ibuf_2_valid_next(ibuf2_valid_next),
 
         .ctrl_pe_matrix_ready(pe_matrix_ready),
-        .ctrl_elw_quant_act_ready(elw_quant_act_ready),
+        .ctrl_elw_quant_act_ready(ctrl_elw_quant_act_ready),
 
         .ctrl_mem_read_addr(accel_read_addr),
         .ctrl_mem_read_enb(accel_read_enb),

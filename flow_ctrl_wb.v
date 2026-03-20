@@ -28,7 +28,7 @@ module flow_ctrl_wb(
         input [3:0] cfg_layer_type,
         input [15:0] out2D_size,
         //element wise unit
-        input elw_quant_act_ready,
+        input [2:0] elw_quant_act_ready,
 
         input mem_write_ready,
 
