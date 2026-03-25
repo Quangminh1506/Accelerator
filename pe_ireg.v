@@ -34,6 +34,8 @@ module pe_reg(
     output reg [7:0] reg_do_2
 
 );   
+    reg [7:0] idata_0, idata_1, idata_2;
+
     always @(posedge clk) begin
         if (reset) begin
             reg_do_0 <= 0;
@@ -41,10 +43,16 @@ module pe_reg(
             reg_do_2 <= 0;
         end 
         else if (enb) begin
-            reg_do_0 <= reg_di_0;
-            reg_do_1 <= reg_di_1;
-            reg_do_2 <= reg_di_2;
+            idata_0 <= reg_di_0;
+            idata_1 <= reg_di_1;
+            idata_2 <= reg_di_2;
         end
+    end
+
+    always @* begin
+        reg_do_0 = idata_0;
+        reg_do_1 = idata_1;
+        reg_do_2 = idata_2;
     end
 
 endmodule

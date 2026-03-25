@@ -37,6 +37,7 @@ module PE_unit
     wire [7:0] lpereg_2 [2:0];
     
     wire ready_0, ready_1, ready_2;
+    wire mac_load_0, mac_load_1, mac_load_2; 
     
     assign ready = ready_0 || ready_1 || ready_2;
     // inst 0
@@ -44,7 +45,7 @@ module PE_unit
         .clk (clk),
         .rst (rst),
         .enb (enb),
-        .mac_ready(ready_0),
+        .mac_ready(mac_load_0),
         .data_in_0 (pe_wdi_0_0),
         .data_in_1 (pe_wdi_0_1),
         .data_in_2 (pe_wdi_0_2),
@@ -65,6 +66,7 @@ module PE_unit
         .wdi_1 (lpereg_0[1]),
         .wdi_2 (lpereg_0[2]),
         .ready (ready_0),
+        .mac_load (mac_load_0),
         .mac_odo (pe_odo_0)
     );
 
@@ -73,7 +75,7 @@ module PE_unit
         .clk (clk),
         .rst (rst),
         .enb (enb),
-        .mac_ready(ready_1),
+        .mac_ready(mac_load_1),
         .data_in_0 (pe_wdi_1_0),
         .data_in_1 (pe_wdi_1_1),
         .data_in_2 (pe_wdi_1_2),
@@ -94,6 +96,7 @@ module PE_unit
         .wdi_1 (lpereg_1[1]),
         .wdi_2 (lpereg_1[2]),
         .ready (ready_1),
+        .mac_load (mac_load_1),
         .mac_odo (pe_odo_1)
     );
     
@@ -102,7 +105,7 @@ module PE_unit
         .clk (clk),
         .rst (rst),
         .enb (enb),
-        .mac_ready(ready_2),
+        .mac_ready(mac_load_2),
         .data_in_0 (pe_wdi_2_0),
         .data_in_1 (pe_wdi_2_1),
         .data_in_2 (pe_wdi_2_2),
@@ -123,6 +126,7 @@ module PE_unit
         .wdi_1 (lpereg_2[1]),
         .wdi_2 (lpereg_2[2]),
         .ready (ready_2),
+        .mac_load (mac_load_2),
         .mac_odo (pe_odo_2)
     );
 

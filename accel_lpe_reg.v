@@ -35,8 +35,8 @@ module accel_lpe_reg(
             data_out_1 <= 0;
             data_out_2 <= 0;
         end
-        else begin
-            if (enb & mac_ready) begin
+        else if (enb) begin
+            if (mac_ready) begin
                 data_out_0 <= data_in_0;
                 data_out_1 <= data_in_1;
                 data_out_2 <= data_in_2; 

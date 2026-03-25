@@ -19,7 +19,6 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-
 module main_accel(
         input clk,
         input reset,
@@ -164,9 +163,9 @@ module main_accel(
     wire accel_write_enb0, accel_write_enb1, accel_write_enb2;
     assign accel_write_enb = accel_write_enb0 || accel_write_enb1 || accel_write_enb2;
 
-    assign accel_write_data = accel_write_enb0 ? obuf0_do :
+    assign accel_write_data = accel_write_enb2 ? obuf2_do :
                               accel_write_enb1 ? obuf1_do :
-                              accel_write_enb2 ? obuf2_do : 0;
+                              accel_write_enb0 ? obuf0_do : 0;
 
     assign obuf0_di = flow_ctrl_out_done ?
                       {4{(cfg_layer_type == POOLING) ? elew_do1 : elew_do0_0}} : acc_matrix_do0;
@@ -454,7 +453,7 @@ module main_accel(
     acc_matrix acc_matrix(
         .clk(clk),
         .reset(reset && accel_ctrl_reset),
-        .enb((acc_matrix_enb0 || acc_matrix_enb1) && accel_ctrl_enb),
+        .enb((acc_matrix_enb0 | acc_matrix_enb1) & accel_ctrl_enb),
 
         .acc_matrix_bps_load(acc_matrix_bp_ld),
         .acc_matrix_bps_write(acc_matrix_bp_write),
@@ -536,14 +535,14 @@ module main_accel(
         .clk(clk),
         .reset(reset && accel_ctrl_reset),
 
-        .quant_act_func_enb_0(quant_act_func_enb0),
-        .quant_act_func_enb_1(quant_act_func_enb1),
-        .quant_act_func_enb_2(quant_act_func_enb2),
+        .quant_act_func_enb_0(quant_act_func_enb0 && accel_ctrl_enb),
+        .quant_act_func_enb_1(quant_act_func_enb1 && accel_ctrl_enb),
+        .quant_act_func_enb_2(quant_act_func_enb2 && accel_ctrl_enb),
 
         .cp_clr(compare_clear),
         .cp2h_enb(weight_kernel_height == 2),
         .cp2w_enb(weight_kernel_width == 2),
-        .cp_enb(compare_enb),
+        .cp_enb(compare_enb && accel_ctrl_enb),
 
         .elew_quant_muler_0(output_mult0),
         .elew_quant_muler_1((cfg_layer_type == CONV) ? output_mult1 : output_mult0),
@@ -566,6 +565,8 @@ module main_accel(
         .elew_do_0_0(elew_do0_0),
         .elew_do_0_1(elew_do0_1),
         .elew_do_0_2(elew_do0_2),
+
+        .elew_do_1(elew_do1),
 
         .valid_0(quant_act_func_ready0),
         .valid_1(quant_act_func_ready1),

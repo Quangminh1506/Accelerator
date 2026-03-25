@@ -382,15 +382,15 @@ module flow_ctrl_read(
                                 
                                 I_LEFT: begin
                                     if (stride_cnt >= w_stride - 1) begin
-                                        if (x_in + w_stride + weight_kernel_width >= w_ifm) begin
+                                        if (x_in + weight_kernel_width + w_stride  >= w_ifm) begin
                                             if (y_in + weight_kernel_height >= h_ifm) begin
                                                 read_input_state <= I_LEFT_DONE;
                                             end
                                             else begin
                                                 read_input_state <= I_DOWN_RIGHT_LEFT;
                                             end
-                                            read_g_state <= GL_WAIT;
                                         end
+                                        read_g_state <= GL_WAIT;
                                     end
                                     else begin
                                         if (valid_pixel_cnt_next < 9) read_g_state <= GL_IREAD;
@@ -415,8 +415,8 @@ module flow_ctrl_read(
                                             else begin
                                                 read_input_state <= I_DOWN_LEFT_RIGHT;
                                             end
-                                            read_g_state <= GL_WAIT;
                                         end
+                                        read_g_state <= GL_WAIT;
                                     end
                                     else begin
                                         if (valid_pixel_cnt_next < 9) read_g_state <= GL_IREAD;
@@ -620,10 +620,10 @@ module flow_ctrl_read(
                                 if (mem_read_ready) begin
                                     if (cnt < 8) cnt <= cnt + 1;        
                                     else cnt <= 0;
-                                    mem_read_state <= !mem_read_state;
+                                    mem_read_state <= ~mem_read_state;
                                 end
                             end      
-                            else mem_read_state <= !mem_read_state;
+                            else mem_read_state <= ~mem_read_state;
                         end
                         
                         GL_WLOAD: begin
@@ -636,10 +636,10 @@ module flow_ctrl_read(
                                 if (mem_read_ready) begin
                                     if (cnt < 2) cnt <= cnt + 1;
                                     else cnt <= 0;
-                                    mem_read_state <= !mem_read_state;
+                                    mem_read_state <= ~mem_read_state;
                                 end
                             end
-                            else mem_read_state <= !mem_read_state;
+                            else mem_read_state <= ~mem_read_state;
                         end
                         
                         GL_BPLOAD: begin
@@ -672,16 +672,16 @@ module flow_ctrl_read(
                                                 cnt <= 0;
                                             end
                                             else begin
-                                                if (ibuf_conv_wstrb > 1) cnt <= cnt + 1;
-                                                else cnt <= cnt + 2;
+                                                if (ibuf_conv_wstrb < 2) cnt <= cnt + 2;
+                                                else cnt <= cnt + 1;
                                             end
                                         end
                                         
                                     endcase
-                                    mem_read_state <= !mem_read_state;
+                                    mem_read_state <= ~mem_read_state;
                                 end
                             end
-                            else mem_read_state <= !mem_read_state;
+                            else mem_read_state <= ~mem_read_state;
                         end
                         
                         GL_ILOAD: begin
@@ -731,9 +731,8 @@ module flow_ctrl_read(
                                         end
                                     end
                                     else begin
-                                        if (valid_pixel_cnt_next < 9) begin
-                                            cnt <= valid_pixel_cnt_next;
-                                        end
+                                        if (valid_pixel_cnt_next < 9) cnt <= valid_pixel_cnt_next;
+
                                         stride_cnt <= stride_cnt + 1;
                                     end
                                 end
@@ -749,7 +748,7 @@ module flow_ctrl_read(
                                                 if (z_kw_in + 3 >= kernel_ifm_depth) begin //done 3 kernel
                                                     ps_addr0 <= ps_base_addr;
                                                     if (is_out_done) begin
-                                                        o_addr0 <= o_addr2 + 1;
+                                                        o_addr0 <= o_addr2 + w_ofm;
                                                         o_quant_sel <= o_quant_sel + 1;
                                                     end    
                                                     
@@ -798,7 +797,7 @@ module flow_ctrl_read(
                                     if (stride_cnt >= h_stride - 1) begin
                                         y_out <= y_out + 1;
                                         ps_addr0[31:2] <= ps_addr0[31:2] + 1;
-                                        if (is_out_done && stride_cnt >= h_stride - 1) begin
+                                        if (is_out_done) begin
                                             o_addr0 <= o_addr0 + 1;
                                         end
                                         stride_cnt <= 0;
@@ -868,10 +867,10 @@ module flow_ctrl_read(
                                         if (valid_pixel_iter_cnt < weight_kernel_width) cnt <= valid_pixel_iter_cnt;
                                         else cnt <= 0;
                                     end
-                                    mem_read_state <= !mem_read_state;
+                                    mem_read_state <= ~mem_read_state;
                                 end
                             end
-                            else mem_read_state <= !mem_read_state;
+                            else mem_read_state <= ~mem_read_state;
                         end
 
                         GL_ILOAD: begin
@@ -939,10 +938,10 @@ module flow_ctrl_read(
                                 if (mem_read_ready) begin
                                     if (cnt >= 2) cnt <= 0;
                                     else cnt <= cnt + 1;
-                                    mem_read_state <= !mem_read_state;
+                                    mem_read_state <= ~mem_read_state;
                                 end
                             end
-                            else mem_read_state = !mem_read_state;
+                            else mem_read_state = ~mem_read_state;
                         end
 
                         GL_ILOAD: begin
@@ -957,10 +956,10 @@ module flow_ctrl_read(
                                 if (mem_read_ready) begin
                                     if (cnt >= 8) cnt <= 0;
                                     else cnt <= cnt + 1;
-                                    mem_read_state <= !mem_read_state;
+                                    mem_read_state <= ~mem_read_state;
                                 end
                             end
-                            else mem_read_state = !mem_read_state;
+                            else mem_read_state = ~mem_read_state;
                         end
 
                         GL_WLOAD: begin
@@ -1326,7 +1325,7 @@ module flow_ctrl_read(
                     
                     GL_IREAD: begin
                         mem_read_enb = 1;
-                        case (mem_read_state)
+                        case (read_input_state)
                             I_BEGIN: begin
                                 case (cnt)
                                     5'd0: mem_read_addr = i_addr0_0;
@@ -1655,7 +1654,7 @@ module flow_ctrl_read(
                                                 ibuf_enb[0] = 1;
                                                 ibuf_ld[0] = 1;
                                                 ibuf_bank_sel[1:0] = 1;
-                                                ibuf_conv_wstrb = {1'b0, !i_sr_addr0_0[1:0]};
+                                                ibuf_conv_wstrb = {1'b0, ~i_sr_addr0_0[1:0]};
                                             end
                                             
                                             5'd1: begin
@@ -1663,7 +1662,7 @@ module flow_ctrl_read(
                                                 ibuf_enb[0] = 1;
                                                 ibuf_ld[0] = 1;
                                                 ibuf_bank_sel[1:0] = 2;
-                                                ibuf_conv_wstrb = {1'b0, !i_sr_addr0_1[1:0]};
+                                                ibuf_conv_wstrb = {1'b0, ~i_sr_addr0_1[1:0]};
                                             end
                                             
                                             5'd2: begin
@@ -1671,7 +1670,7 @@ module flow_ctrl_read(
                                                 ibuf_enb[0] = 1;
                                                 ibuf_ld[0] = 1;
                                                 ibuf_bank_sel[1:0] = 3;
-                                                ibuf_conv_wstrb = {1'b0, !i_sr_addr0_2[1:0]};
+                                                ibuf_conv_wstrb = {1'b0, ~i_sr_addr0_2[1:0]};
                                             end
                                             
                                             5'd3: begin
@@ -1679,7 +1678,7 @@ module flow_ctrl_read(
                                                 ibuf_enb[1] = 1;
                                                 ibuf_ld[1] = 1;
                                                 ibuf_bank_sel[3:2] = 1;
-                                                ibuf_conv_wstrb = {1'b0, !i_sr_addr1_0[1:0]};
+                                                ibuf_conv_wstrb = {1'b0, ~i_sr_addr1_0[1:0]};
                                             end
                                             
                                             5'd4: begin
@@ -1687,7 +1686,7 @@ module flow_ctrl_read(
                                                 ibuf_enb[1] = 1;
                                                 ibuf_ld[1] = 1;
                                                 ibuf_bank_sel[3:2] = 2;
-                                                ibuf_conv_wstrb = {1'b0, !i_sr_addr1_1[1:0]};
+                                                ibuf_conv_wstrb = {1'b0, ~i_sr_addr1_1[1:0]};
                                             end
                                             
                                             5'd5: begin
@@ -1695,7 +1694,7 @@ module flow_ctrl_read(
                                                 ibuf_enb[1] = 1;
                                                 ibuf_ld[1] = 1;
                                                 ibuf_bank_sel[3:2] = 3;
-                                                ibuf_conv_wstrb = {1'b0, !i_sr_addr1_2[1:0]};
+                                                ibuf_conv_wstrb = {1'b0, ~i_sr_addr1_2[1:0]};
                                             end
                                             
                                             5'd6: begin
@@ -1703,7 +1702,7 @@ module flow_ctrl_read(
                                                 ibuf_enb[2] = 1;
                                                 ibuf_ld[2] = 1;
                                                 ibuf_bank_sel[5:4] = 1;
-                                                ibuf_conv_wstrb = {1'b0, !i_sr_addr2_0[1:0]};
+                                                ibuf_conv_wstrb = {1'b0, ~i_sr_addr2_0[1:0]};
                                             end
                                             
                                             5'd7: begin
@@ -1711,7 +1710,7 @@ module flow_ctrl_read(
                                                 ibuf_enb[2] = 1;
                                                 ibuf_ld[2] = 1;
                                                 ibuf_bank_sel[5:4] = 2;
-                                                ibuf_conv_wstrb = {1'b0, !i_sr_addr2_1[1:0]};
+                                                ibuf_conv_wstrb = {1'b0, ~i_sr_addr2_1[1:0]};
                                             end
                                             
                                             5'd8: begin
@@ -1719,7 +1718,7 @@ module flow_ctrl_read(
                                                 ibuf_enb[2] = 1;
                                                 ibuf_ld[2] = 1;
                                                 ibuf_bank_sel[5:4] = 3;
-                                                ibuf_conv_wstrb = {1'b0, !i_sr_addr2_2[1:0]};
+                                                ibuf_conv_wstrb = {1'b0, ~i_sr_addr2_2[1:0]};
                                             end
                                             
                                         endcase
@@ -1733,7 +1732,7 @@ module flow_ctrl_read(
                                                 ibuf_enb[0] = 1;
                                                 ibuf_ld[0] = 1;
                                                 ibuf_bank_sel[1:0] = 3;
-                                                ibuf_conv_wstrb = {1'b0, !i_sdrl_addr0[1:0]};
+                                                ibuf_conv_wstrb = {1'b0, ~i_sdrl_addr0[1:0]};
                                             end
                                             
                                             5'd1: begin
@@ -1742,7 +1741,7 @@ module flow_ctrl_read(
                                                 ibuf_enb[0] = 1;
                                                 ibuf_ld[0] = 1;
                                                 ibuf_bank_sel[1:0] = 3;
-                                                ibuf_conv_wstrb = {1'b0, !i_sdrl_addr0[1:0]} + 3;
+                                                ibuf_conv_wstrb = {1'b0, ~i_sdrl_addr0[1:0]} + 3;
                                             end
                                             
                                             5'd2: begin
@@ -1751,7 +1750,7 @@ module flow_ctrl_read(
                                                 ibuf_enb[1] = 1;
                                                 ibuf_ld[1] = 1;
                                                 ibuf_bank_sel[3:2] = 3;
-                                                ibuf_conv_wstrb = {1'b0, !i_sdrl_addr1[1:0]};
+                                                ibuf_conv_wstrb = {1'b0, ~i_sdrl_addr1[1:0]};
                                             end
                                             
                                             5'd3: begin
@@ -1760,7 +1759,16 @@ module flow_ctrl_read(
                                                 ibuf_enb[1] = 1;
                                                 ibuf_ld[1] = 1;
                                                 ibuf_bank_sel[3:2] = 3;
-                                                ibuf_conv_wstrb = {1'b0, !i_sdrl_addr1[1:0]} + 3;
+                                                ibuf_conv_wstrb = {1'b0, ~i_sdrl_addr1[1:0]} + 3;
+                                            end
+                                            
+                                            5'd4: begin
+                                                ibuf_di_reverse[2] = 1;
+                                                ibuf_do_reverse[2] = 1;
+                                                ibuf_enb[2] = 1;
+                                                ibuf_ld[2] = 1;
+                                                ibuf_bank_sel[5:4] = 3;
+                                                ibuf_conv_wstrb = {1'b0, ~i_sdrl_addr2[1:0]};
                                             end
                                             
                                             5'd5: begin
@@ -1769,16 +1777,7 @@ module flow_ctrl_read(
                                                 ibuf_enb[2] = 1;
                                                 ibuf_ld[2] = 1;
                                                 ibuf_bank_sel[5:4] = 3;
-                                                ibuf_conv_wstrb = {1'b0, !i_sdrl_addr2[1:0]};
-                                            end
-                                            
-                                            5'd5: begin
-                                                ibuf_di_reverse[2] = 1;
-                                                ibuf_do_reverse[2] = 1;
-                                                ibuf_enb[2] = 1;
-                                                ibuf_ld[2] = 1;
-                                                ibuf_bank_sel[5:4] = 3;
-                                                ibuf_conv_wstrb = {1'b0, !i_sdrl_addr2[1:0]} + 3;
+                                                ibuf_conv_wstrb = {1'b0, ~i_sdrl_addr2[1:0]} + 3;
                                             end
                                         endcase
                                     end                                
@@ -1821,8 +1820,8 @@ module flow_ctrl_read(
                                 pe_matrix_conv_dir = DOWN;
                                 idemux = 0;
                                 ireg_enb = 9'b111111111;
-                                ibuf_conv_fi_load = (h_stride == 2) ? 1 : 0;
-                                ibuf_conv_se_load = (stride_cnt == h_stride - 1) ? 1 : 0;
+                                ibuf_conv_se_load = (h_stride == 2);
+                                ibuf_conv_fi_load = (stride_cnt == h_stride - 1);
                             end
                             
                             I_RIGHT: begin
@@ -1837,8 +1836,8 @@ module flow_ctrl_read(
                                 ireg_enb = 9'b111111111;
                                 ibuf_di_reverse = 3'b111;
                                 ibuf_do_reverse = 3'b111;
-                                ibuf_conv_fi_load = (h_stride == 2) ? 1 : 0;
-                                ibuf_conv_se_load = (stride_cnt == h_stride - 1) ? 1 : 0;
+                                ibuf_conv_se_load = (h_stride == 2);
+                                ibuf_conv_fi_load = (stride_cnt == h_stride - 1);
                             end
                         endcase
                     end

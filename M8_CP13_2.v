@@ -21,11 +21,11 @@
 
 
 module M8_CP13_2 (
-    input  wire [7:0] A,
-    input  wire [7:0] B,
-    output wire [15:0] P
+    input [7:0] A,
+    input [7:0] B,
+    output [15:0] P
 );
-
+//        assign P = A*B;
     wire pp [7:0][7:0];
     genvar i, j;
     generate

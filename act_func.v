@@ -21,15 +21,15 @@
 
 
 module act_func(
-        input  [31:0] act_func_di,
+        input signed [31:0] act_func_di,
         input  [3:0] act_func_type,
-        output [31:0] act_func_do
+        output signed [31:0] act_func_do
     );
     
     localparam RELU    = 4'd0,
                RELU6   = 4'd1;
  
-    reg [31:0] act_func_data;
+    reg [7:0] act_func_data;
     always @(*) begin
         act_func_data = act_func_di;
         case (act_func_type)

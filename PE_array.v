@@ -43,15 +43,15 @@ module PE_array(
         input [7:0] pe_arr_idi_2_0, pe_arr_idi_2_1, pe_arr_idi_2_2,
         
         // Weight signals
-        // Row 0
+        // c0
         input [7:0] pe_arr_wdi_0_0_0, pe_arr_wdi_0_0_1, pe_arr_wdi_0_0_2,
         input [7:0] pe_arr_wdi_0_1_0, pe_arr_wdi_0_1_1, pe_arr_wdi_0_1_2,
         input [7:0] pe_arr_wdi_0_2_0, pe_arr_wdi_0_2_1, pe_arr_wdi_0_2_2,
-        // Row 1                                          
+        // c1                                          
         input [7:0] pe_arr_wdi_1_0_0, pe_arr_wdi_1_0_1, pe_arr_wdi_1_0_2,
         input [7:0] pe_arr_wdi_1_1_0, pe_arr_wdi_1_1_1, pe_arr_wdi_1_1_2,
         input [7:0] pe_arr_wdi_1_2_0, pe_arr_wdi_1_2_1, pe_arr_wdi_1_2_2,
-        // Row 2                                          
+        // c2                                          
         input [7:0] pe_arr_wdi_2_0_0, pe_arr_wdi_2_0_1, pe_arr_wdi_2_0_2,
         input [7:0] pe_arr_wdi_2_1_0, pe_arr_wdi_2_1_1, pe_arr_wdi_2_1_2,
         input [7:0] pe_arr_wdi_2_2_0, pe_arr_wdi_2_2_1, pe_arr_wdi_2_2_2,
@@ -64,9 +64,9 @@ module PE_array(
         output ready
     );
     
-    localparam LEFT = 4'd1,
-               RIGHT = 4'd2,
-               DOWN = 4'd3;
+    localparam LEFT = 2'd1,
+               RIGHT = 2'd2,
+               DOWN = 2'd3;
     
     wire [7:0] ireg_to_pe [2:0][2:0]; 
     wire [7:0] wreg_to_pe [2:0][2:0][2:0]; 
@@ -76,16 +76,16 @@ module PE_array(
     assign ready = ready_0 || ready_1 || ready_2;
     
     always @* begin // [col][row]
+        ireg_idi[0][0] = pe_arr_idi_0_0; 
+        ireg_idi[0][1] = pe_arr_idi_0_1; 
+        ireg_idi[0][2] = pe_arr_idi_0_2;
+        ireg_idi[1][0] = pe_arr_idi_1_0; 
+        ireg_idi[1][1] = pe_arr_idi_1_1; 
+        ireg_idi[1][2] = pe_arr_idi_1_2;
+        ireg_idi[2][0] = pe_arr_idi_2_0; 
+        ireg_idi[2][1] = pe_arr_idi_2_1;
+        ireg_idi[2][2] = pe_arr_idi_2_2;
         if (pe_arr_is_conv_layer) begin
-            ireg_idi[0][0] = pe_arr_idi_0_0; 
-            ireg_idi[0][1] = pe_arr_idi_0_1; 
-            ireg_idi[0][2] = pe_arr_idi_0_2;
-            ireg_idi[1][0] = pe_arr_idi_1_0; 
-            ireg_idi[1][1] = pe_arr_idi_1_1; 
-            ireg_idi[1][2] = pe_arr_idi_1_2;
-            ireg_idi[2][0] = pe_arr_idi_2_0; 
-            ireg_idi[2][1] = pe_arr_idi_2_1;
-            ireg_idi[2][2] = pe_arr_idi_2_2;
                 case (pe_arr_conv_dir)
                     LEFT: begin 
                         ireg_idi[0][0] = ireg_to_pe[1][0]; 
@@ -106,13 +106,13 @@ module PE_array(
                         ireg_idi[0][1] = pe_arr_idi_0_1;
                         ireg_idi[0][2] = pe_arr_idi_0_2;
                         
-                        ireg_idi[1][0] = ireg_idi[0][0];
-                        ireg_idi[1][1] = ireg_idi[0][1];
-                        ireg_idi[1][2] = ireg_idi[0][2];
+                        ireg_idi[1][0] = ireg_to_pe[0][0];
+                        ireg_idi[1][1] = ireg_to_pe[0][1];
+                        ireg_idi[1][2] = ireg_to_pe[0][2];
                         
-                        ireg_idi[2][0] = ireg_idi[1][0];
-                        ireg_idi[2][1] = ireg_idi[1][1];
-                        ireg_idi[2][2] = ireg_idi[1][2];
+                        ireg_idi[2][0] = ireg_to_pe[1][0];
+                        ireg_idi[2][1] = ireg_to_pe[1][1];
+                        ireg_idi[2][2] = ireg_to_pe[1][2];
                     end
 
                     
@@ -125,9 +125,9 @@ module PE_array(
                         ireg_idi[2][0] = ireg_to_pe[2][1]; 
                         ireg_idi[2][1] = ireg_to_pe[2][2];
 
-                        ireg_idi[0][2] = pe_arr_idi_0_2;
-                        ireg_idi[1][2] = pe_arr_idi_1_2;
-                        ireg_idi[2][2] = pe_arr_idi_2_2;
+                        ireg_idi[0][2] = pe_arr_idi_0_0;
+                        ireg_idi[1][2] = pe_arr_idi_0_1;
+                        ireg_idi[2][2] = pe_arr_idi_0_2;
                     end
                 endcase
             end

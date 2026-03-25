@@ -275,6 +275,7 @@ module elw_unit(
         
         .cp_do      (elew_do_1)
     );
+    
     wire [31:0] acc_sub_offset_0, acc_sub_offset_1, acc_sub_offset_2;
     assign acc_sub_offset_0 = act_func_do_0 - elew_output_offset;
     assign acc_sub_offset_1 = act_func_do_1 - elew_output_offset;

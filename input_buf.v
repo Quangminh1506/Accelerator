@@ -81,40 +81,40 @@ module input_buf(
                                 3'd0: begin
                                     buf_b0_data[31:0] <= ibuf_di_data;
                                     buf_b0_valid[3:0] <= 4'b1111;
-                                    
+
                                     buf_b0_data[47:32] <= 0;
                                     buf_b0_valid[5:4] <= 0;
                                 end
-                                
+
                                 3'd1: begin
                                     buf_b0_data[23:0] <= ibuf_di_data[31:8];
                                     buf_b0_valid[2:0] <= 3'b111;
-                                    
+
                                     buf_b0_data[47:24] <= 0;
                                     buf_b0_valid[5:3] <= 0;
                                 end
-                                
+
                                 3'd2: begin
                                     buf_b0_data[15:0] <= ibuf_di_data[31:16];
                                     buf_b0_valid[1:0] <= 2'b11;
-                                    
+
                                     buf_b0_data[47:16] <= 0;
                                     buf_b0_valid[5:2] <= 0;
                                 end
-                                
+
                                 3'd3: begin
-                                    buf_b0_data[7:0] <= ibuf_di_data[31:23];
+                                    buf_b0_data[7:0] <= ibuf_di_data[31:24];
                                     buf_b0_valid[0] <= 1'b1;
-                                    
+
                                     buf_b0_data[47:8] <= 0;
                                     buf_b0_valid[5:1] <= 0;
                                 end
-                                
+
                                 3'd5: begin
                                     buf_b0_data[47:16] <= ibuf_di_data;
                                     buf_b0_valid[5:2] <= 4'b1111;
                                 end
-                                
+
                                 3'd6: begin
                                     buf_b0_data[39:8] <= ibuf_di_data;
                                     buf_b0_valid[4:1] <= 4'b1111;
@@ -149,7 +149,7 @@ module input_buf(
                                 end
                                 
                                 3'd3: begin
-                                    buf_b1_data[7:0] <= ibuf_di_data[31:23];
+                                    buf_b1_data[7:0] <= ibuf_di_data[31:24];
                                     buf_b1_valid[0] <= 1'b1;
                                     
                                     buf_b1_data[47:8] <= 0;
@@ -195,7 +195,7 @@ module input_buf(
                                 end
                                 
                                 3'd3: begin
-                                    buf_b2_data[7:0] <= ibuf_di_data[31:23];
+                                    buf_b2_data[7:0] <= ibuf_di_data[31:24];
                                     buf_b2_valid[0] <= 1'b1;
                                     
                                     buf_b2_data[47:8] <= 0;
@@ -234,7 +234,7 @@ module input_buf(
                                 end
                                 
                                 2'd3: begin
-                                    buf_b0_data[7:0] <= ibuf_di_data[31:23];
+                                    buf_b0_data[7:0] <= ibuf_di_data[31:24];
                                 end           
                             endcase
                         end
@@ -286,106 +286,104 @@ module input_buf(
                         
                     endcase
                 end
-                             
                 endcase
             end
-        end
-        
-        else begin
-            case (cfg_layer_type)
-                CONV: begin 
-                    if (ibuf_conv_se_load) begin
-                        if (ibuf_conv_fi_load) begin
-                            buf_b0_data[47:0] <= 0;
-                            buf_b0_valid[5:0] <= 0;
+            else begin
+                case (cfg_layer_type)
+                    CONV: begin 
+                        if (ibuf_conv_se_load) begin
+                            if (ibuf_conv_fi_load) begin
+                                buf_b0_data[47:0] <= 0;
+                                buf_b0_valid[5:0] <= 0;
 
-                            buf_b1_data[23:0] <= buf_b1_data[47:24];
-                            buf_b1_valid[2:0] <= buf_b1_valid[5:3];
+                                buf_b1_data[23:0] <= buf_b1_data[47:24];
+                                buf_b1_valid[2:0] <= buf_b1_valid[5:3];
 
-                            buf_b1_data[47:24] <= 0;
-                            buf_b1_valid[5:3] <= 0;
+                                buf_b1_data[47:24] <= 0;
+                                buf_b1_valid[5:3] <= 0;
 
-                            buf_b2_data[23:0] <= buf_b2_data[47:24];
-                            buf_b2_valid[2:0] <= buf_b2_valid[5:3];
+                                buf_b2_data[23:0] <= buf_b2_data[47:24];
+                                buf_b2_valid[2:0] <= buf_b2_valid[5:3];
 
-                            buf_b2_data[47:24] <= 0;
-                            buf_b2_valid[5:3] <= 0;
+                                buf_b2_data[47:24] <= 0;
+                                buf_b2_valid[5:3] <= 0;
+                            end 
+                            else begin
+                                buf_b0_data[47:0] <= 0;
+                                buf_b0_valid[5:0] <= 0;
+
+                                buf_b1_data[47:24] <= buf_b2_data[47:24];
+                                buf_b1_valid[5:3] <= buf_b2_valid[5:3];
+
+                                buf_b1_data[23:0] <= 0;
+                                buf_b1_valid[2:0] <= 0;
+
+                                buf_b2_data[47:0] <= 0;
+                                buf_b2_valid[5:0] <= 0;
+                            end
                         end 
                         else begin
-                            buf_b0_data[47:0] <= 0;
-                            buf_b0_valid[5:0] <= 0;
+                            if (ibuf_conv_fi_load) begin
+                                buf_b0_data[47:0] <= 0;
+                                buf_b0_valid[5:0] <= 0;
 
-                            buf_b1_data[47:24] <= buf_b2_data[47:24];
-                            buf_b1_valid[5:3] <= buf_b2_valid[5:3];
+                                buf_b1_data[47:0] <= 0;
+                                buf_b1_valid[5:0] <= 0;
 
-                            buf_b1_data[23:0] <= 0;
-                            buf_b1_valid[2:0] <= 0;
+                                buf_b2_data[23:0] <= buf_b2_data[47:24];
+                                buf_b2_valid[2:0] <= buf_b2_valid[5:3];
 
-                            buf_b2_data[47:0] <= 0;
-                            buf_b2_valid[5:0] <= 0;
+                                buf_b2_data[47:24] <= 0;
+                                buf_b2_valid[5:3] <= 0;
+                            end 
+                            else begin
+                                buf_b0_data[39:0] <= buf_b0_data[47:8];
+                                buf_b0_data[47:40] <= 0;
+                                buf_b0_valid[4:0] <= buf_b0_valid[ 5:1];
+                                buf_b0_valid[5] <= 0;
+
+                                buf_b1_data[39:0] <= buf_b1_data[ 47:  8];
+                                buf_b1_data[47:40] <= 0;
+                                buf_b1_valid[4:0] <= buf_b1_valid[ 5:  1];
+                                buf_b1_valid[5] <= 0;
+
+                                buf_b2_data[39:0] <= buf_b2_data[47:8];
+                                buf_b2_data[47:40] <= 0;
+                                buf_b2_valid[4:0] <= buf_b2_valid[5:1];
+                                buf_b2_valid[5] <= 0;
+                            end
                         end
                     end 
-                    else begin
-                        if (ibuf_conv_fi_load) begin
-                            buf_b0_data[47:0] <= 0;
-                            buf_b0_valid[5:0] <= 0;
 
-                            buf_b1_data[47:0] <= 0;
-                            buf_b1_valid[5:0] <= 0;
+                    DENSE: begin
+                        buf_b0_data[15: 0] <= buf_b0_data[23: 8];
+                        buf_b0_data[23:16] <= 0; 
 
-                            buf_b2_data[23:0] <= buf_b2_data[47:24];
-                            buf_b2_valid[2:0] <= buf_b2_valid[5:3];
+                        buf_b1_data[15: 0] <= buf_b1_data[23: 8];
+                        buf_b1_data[23:16] <= 0; 
 
-                            buf_b2_data[47:24] <= 0;
-                            buf_b2_valid[5:3] <= 0;
-                        end 
-                        else begin
-                            buf_b0_data[39:0] <= buf_b0_data[47:8];
-                            buf_b0_data[47:40] <= 0;
-                            buf_b0_valid[4:0] <= buf_b0_valid[ 5:1];
-                            buf_b0_valid[5] <= 0;
-
-                            buf_b1_data[39:0] <= buf_b1_data[ 47:  8];
-                            buf_b1_data[47:40] <= 0;
-                            buf_b1_valid[4:0] <= buf_b1_valid[ 5:  1];
-                            buf_b1_valid[5] <= 0;
-
-                            buf_b2_data[39:0] <= buf_b2_data[47:8];
-                            buf_b2_data[47:40] <= 0;
-                            buf_b2_valid[4:0] <= buf_b2_valid[5:1];
-                            buf_b2_valid[5] <= 0;
-                        end
+                        buf_b2_data[15: 0] <= buf_b2_data[23: 8];
+                        buf_b2_data[23:16] <= 0; 
                     end
-                end 
 
-                DENSE: begin
-                    buf_b0_data[15: 0] <= buf_b0_data[23: 8];
-                    buf_b0_data[23:16] <= 0; 
+                    POOLING: begin
+                        buf_b0_data[39:0] <= buf_b0_data[47:8];
+                        buf_b0_data[47:40] <= 0;
+                        buf_b0_valid[4:0] <= buf_b0_valid[5:1];
+                        buf_b0_valid[5] <= 0;
 
-                    buf_b1_data[15: 0] <= buf_b1_data[23: 8];
-                    buf_b1_data[23:16] <= 0; 
+                        buf_b1_data[39:0] <= buf_b1_data[47:8];
+                        buf_b1_data[47:40] <= 0;
+                        buf_b1_valid[4:0] <= buf_b1_valid[5:1];
+                        buf_b1_valid[5] <= 0;
 
-                    buf_b2_data[15: 0] <= buf_b2_data[23: 8];
-                    buf_b2_data[23:16] <= 0; 
-                end
-
-                POOLING: begin
-                    buf_b0_data[39:0] <= buf_b0_data[47:8];
-                    buf_b0_data[47:40] <= 0;
-                    buf_b0_valid[4:0] <= buf_b0_valid[5:1];
-                    buf_b0_valid[5] <= 0;
-
-                    buf_b1_data[39:0] <= buf_b1_data[47:8];
-                    buf_b1_data[47:40] <= 0;
-                    buf_b1_valid[4:0] <= buf_b1_valid[5:1];
-                    buf_b1_valid[5] <= 0;
-
-                    buf_b2_data[39:0] <= buf_b2_data[47:8];
-                    buf_b2_data[47:40] <= 0;
-                    buf_b2_valid[4:0] <= buf_b2_valid[5:1];
-                    buf_b2_valid[5] <= 0;
-                end
+                        buf_b2_data[39:0] <= buf_b2_data[47:8];
+                        buf_b2_data[47:40] <= 0;
+                        buf_b2_valid[4:0] <= buf_b2_valid[5:1];
+                        buf_b2_valid[5] <= 0;
+                    end
                 endcase
+            end
         end
     end 
     

@@ -30,6 +30,7 @@ module accel_mac(
     input [7:0] wdi_0, wdi_1, wdi_2,
 
     output reg ready,
+    output reg mac_load,
     output reg [31:0] mac_odo
 );
 
@@ -44,9 +45,15 @@ module accel_mac(
     
     always @(*) begin
         case(state)
+            IDLE: begin
+                mac_load = 1;
+                ready = 0;
+            end
+        
             MAC0: begin 
                 mux_idi = idi_0; 
-                mux_wdi = wdi_0; 
+                mux_wdi = wdi_0;
+                mac_load = 0; 
                 ready = 0;
             end 
             MAC1: begin
@@ -76,6 +83,7 @@ module accel_mac(
     wire [7:0] us_idi    = us_idi_9b[7:0]; // Chỉ lấy 8 bit đưa vào bộ nhân
     wire [7:0] us_wdi    = wdi_sign ? (~mux_wdi + 1'b1) : mux_wdi;
     
+    wire [15:0] prod;
     M8_CP13_2 mult (
         .A(us_idi),
         .B(us_wdi),
@@ -96,6 +104,7 @@ module accel_mac(
             case (state)
                 IDLE: begin
                     state <= MAC0;
+                    mac_odo <= 0;
                 end
                 
                 MAC0: begin
