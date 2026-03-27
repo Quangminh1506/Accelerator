@@ -279,6 +279,8 @@ module flow_ctrl_read(
         is_out_done = 0;
         case (cfg_layer_type) 
             CONV: is_out_done = (z_kw_in + 3 >= kernel_ifm_depth) ? 1 : 0;
+            POOLING: is_out_done = 1;
+            DENSE: is_out_done = (x_in + 9 >= weight_kernel_width) ? 1 : 0;
         endcase
     end
                
@@ -1955,7 +1957,7 @@ module flow_ctrl_read(
                                 ireg_enb[1] = 1;
                             end
 
-                            5'd0: begin
+                            5'd2: begin
                                 idemux = 2;
                                 ireg_enb[2] = 1;
                             end
