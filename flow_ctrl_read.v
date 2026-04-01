@@ -123,8 +123,8 @@ module flow_ctrl_read(
     reg [3:0] read_g_state, read_weight_state, read_input_state;
     
     //define coor
-    reg [15:0] x_in, y_in, x_out, y_out;
-    reg [15:0] x_kw, y_kw, z_kw_in, z_kw_num_out;
+    reg [15:0] x_in, y_in, x_out; //y_out;
+    reg [15:0] z_kw_in, z_kw_num_out;
     reg mem_read_state;
     
     //address
@@ -569,9 +569,7 @@ module flow_ctrl_read(
             x_in <= 0;
             y_in <= 0;
             x_out <= 0;
-            y_out <= 0;
-            x_kw <= 0;
-            y_kw <= 0;
+            //y_out <= 0;
             z_kw_in <= 0;
             z_kw_num_out <= 0;
             
@@ -601,9 +599,7 @@ module flow_ctrl_read(
                             x_in <= 0;
                             y_in <= 0;
                             x_out <= 0;
-                            y_out <= 0;
-                            x_kw <= 0;
-                            y_kw <= 0;
+                            //y_out <= 0;
                             z_kw_in <= 0;
                             z_kw_num_out <= 0;
 
@@ -781,7 +777,7 @@ module flow_ctrl_read(
                                     y_in <= y_in + 1;
                                     i_addr0_0 <= i_addr0_0 + w_ifm;
                                     if (stride_cnt >= h_stride - 1) begin
-                                        y_out <= y_out + 1;
+                                        //y_out <= y_out + 1;
                                         ps_addr0[31:2] <= ps_addr0[31:2] - 1;
                                         if (is_out_done && stride_cnt >= h_stride - 1) begin
                                             o_addr0 <= o_addr0 - 1;
@@ -797,7 +793,7 @@ module flow_ctrl_read(
                                     y_in <= y_in + 1;
                                     i_addr0_0 <= i_addr0_0 + w_ifm;
                                     if (stride_cnt >= h_stride - 1) begin
-                                        y_out <= y_out + 1;
+                                        //y_out <= y_out + 1;
                                         ps_addr0[31:2] <= ps_addr0[31:2] + 1;
                                         if (is_out_done) begin
                                             o_addr0 <= o_addr0 + 1;
@@ -815,7 +811,7 @@ module flow_ctrl_read(
                                     x_in <= 0;
                                     y_in <= 0;
                                     x_out <= 0;
-                                    y_out <= 0;
+                                    //y_out <= 0;
                                     
                                     if (z_kw_in < 3) begin
                                         bp_addr0 <= bp_addr0 + 12;

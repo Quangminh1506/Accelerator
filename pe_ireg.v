@@ -38,9 +38,9 @@ module pe_reg(
 
     always @(posedge clk) begin
         if (reset) begin
-            reg_do_0 <= 0;
-            reg_do_1 <= 0;
-            reg_do_2 <= 0;
+            idata_0 <= 0;
+            idata_1 <= 0;
+            idata_2 <= 0;
         end 
         else if (enb) begin
             idata_0 <= reg_di_0;

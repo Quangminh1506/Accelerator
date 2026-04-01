@@ -141,7 +141,7 @@ module flow_ctrl(
     );
 
   wire read_ready, read_done, comp_ready, comp_done, wb_ready, wb_done;
-  wire comp_start, wb_start;
+  wire wb_start, comp_start;
   wire read_out_done, comp_out_done, wb_out_done;
 
   wire [3:0] read_o_quant_sel, comp_o_quant_sel, wb_o_quant_sel;
@@ -285,7 +285,7 @@ module flow_ctrl(
 
     .comp_ready(comp_ready),
     .comp_done(comp_done),
-    .comp_start(comp_start),
+    //.comp_start(comp_start),
     .comp_out_done(comp_out_done),
     .comp_o_addr(comp_o_addr),
     .comp_o_quant_sel(comp_o_quant_sel),

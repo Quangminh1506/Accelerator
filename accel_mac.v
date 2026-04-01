@@ -46,6 +46,8 @@ module accel_mac(
     always @(*) begin
         case(state)
             IDLE: begin
+                mux_idi = 0;
+                mux_wdi = 0;
                 mac_load = 1;
                 ready = 0;
             end
@@ -59,16 +61,19 @@ module accel_mac(
             MAC1: begin
                 mux_idi = idi_1; 
                 mux_wdi = wdi_1; 
+                mac_load = 0; 
                 ready = 0;
             end 
             MAC2: begin 
                 mux_idi = idi_2; 
                 mux_wdi = wdi_2; 
+                mac_load = 0; 
                 ready = 1;
             end 
             default: begin 
-                mux_idi = idi_0; 
-                mux_wdi = wdi_0; 
+                mux_idi = 0; 
+                mux_wdi = 0; 
+                mac_load = 0; 
                 ready = 0;
             end
         endcase

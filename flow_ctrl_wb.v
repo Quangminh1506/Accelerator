@@ -41,7 +41,7 @@ module flow_ctrl_wb(
         //from comp signals
         input comp_ready,
         input comp_done,
-        input comp_start,
+        //input comp_start,
         input comp_out_done,
         input [31:0] comp_o_addr,
         input [31:0] comp_ps_addr,

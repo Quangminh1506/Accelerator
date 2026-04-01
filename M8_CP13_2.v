@@ -25,7 +25,7 @@ module M8_CP13_2 (
     input [7:0] B,
     output [15:0] P
 );
-        assign P = A*B;
+      assign P = A*B;
 //    wire pp [7:0][7:0];
 //    genvar i, j;
 //    generate
