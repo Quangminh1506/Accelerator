@@ -22,7 +22,7 @@
 
 module input_buf(
         input clk,
-        input reset,
+        input resetn,
         input enb,
         
         input [3:0] cfg_layer_type,
@@ -63,7 +63,7 @@ module input_buf(
     reg [5:0] buf_b2_valid;
     
     always @(posedge clk) begin
-        if (reset) begin
+        if (!resetn) begin
             buf_b0_data <= 0;
             buf_b1_data <= 0;
             buf_b2_data <= 0;

@@ -22,7 +22,7 @@
 
 module accel_mac(
     input clk,
-    input rst,
+    input rstn,
     input enb,
     input [31:0] input_offset, 
     
@@ -101,7 +101,7 @@ module accel_mac(
     reg [31:0] acc;
     
     always @(posedge clk) begin
-        if (rst) begin
+        if (!rstn) begin
             state <= IDLE;
             acc <= 32'd0;
             mac_odo <= 32'd0;

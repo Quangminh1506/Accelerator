@@ -22,7 +22,7 @@
 
 module acc_matrix(
         input clk,
-        input reset,
+        input resetn,
         input enb,
 
         //config sigs
@@ -87,7 +87,7 @@ module acc_matrix(
     reg [31:0]  acc_matrix_inter_sum_0_reg, acc_matrix_inter_sum_1_reg, acc_matrix_inter_sum_2_reg;
     
     always @(posedge clk) begin
-        if (reset) begin
+        if (!resetn) begin
             acc_matrix_bps_0_reg <= 0;
             acc_matrix_bps_1_reg <= 0;
             acc_matrix_bps_2_reg <= 0;

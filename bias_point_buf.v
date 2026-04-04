@@ -22,7 +22,7 @@
 
 module bias_point_buf(
         input clk,
-        input reset,
+        input resetn,
         input enb,
         
         input bpbuf_ld,
@@ -32,7 +32,7 @@ module bias_point_buf(
     );
 
     always @(posedge clk) begin
-        if (reset) 
+        if (!resetn) 
             bpbuf_do <= 0;
         else 
         if (enb) begin

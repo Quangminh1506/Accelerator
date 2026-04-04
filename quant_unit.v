@@ -22,7 +22,7 @@
 
 module quant_unit(
         input clk,
-        input reset,
+        input resetn,
         input enb,
         
         // data sigs
@@ -69,7 +69,7 @@ module quant_unit(
     assign  quant_udi = (quant_sdi) ? ~quant_di_reg + 1 : quant_di_reg;
     
     always @(posedge clk) begin
-        if (reset) begin
+        if (!resetn) begin
             quant_di_reg <= 0;
         end 
         else if (enb) begin
@@ -89,7 +89,7 @@ module quant_unit(
                STAGE8 = 4'd8;
 
     always @(posedge clk) begin
-        if (reset) 
+        if (!resetn) 
             state <= LOAD;
         else if (enb) begin
             case(state) 
@@ -156,7 +156,7 @@ module quant_unit(
 
     // Store Data
     always @(posedge clk) begin
-        if (reset) begin
+        if (!resetn) begin
             quant_mul_result <= 0;
         end 
         else if (enb) begin

@@ -22,7 +22,7 @@
 
 module weight_buf(
         input clk,
-        input reset,
+        input resetn,
         input enb,
         
         input [31:0] wbuf_di,
@@ -37,7 +37,7 @@ module weight_buf(
     reg [71:0] buf_data;
     
     always @(posedge clk) begin
-        if (reset) begin
+        if (!resetn) begin
             buf_data <= 0;
         end
         else begin

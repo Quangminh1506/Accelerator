@@ -22,7 +22,7 @@
 
 module config_regs (
     input   clk,
-    input   reset,
+    input   resetn,
     
     input   config_wen,
     input  [31:0] config_data,
@@ -82,7 +82,7 @@ module config_regs (
 
     integer i;
     always @(posedge clk) begin
-        if (reset) begin
+        if (!resetn) begin
             i_base_addr <= 0;
             kw_base_addr <= 0;
             o_base_addr <= 0;

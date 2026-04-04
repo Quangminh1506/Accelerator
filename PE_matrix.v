@@ -22,7 +22,7 @@
 
 module PE_matrix(
         input clk,
-        input reset,
+        input resetn,
 
         //Config sigs
         input matrix_is_conv_layer,
@@ -250,7 +250,7 @@ module PE_matrix(
     //PE array
     PE_array pe_array_0 (
         .clk(clk), 
-        .reset(reset),
+        .resetn(resetn),
 
         .wreg_enb_0_0(pe_matrix_wreg_enb_0_0_0),
         .wreg_enb_0_1(pe_matrix_wreg_enb_0_0_1),
@@ -329,7 +329,7 @@ module PE_matrix(
     
     PE_array pe_array_1(
         .clk(clk), 
-        .reset(reset),
+        .resetn(resetn),
 
         .wreg_enb_0_0(pe_matrix_wreg_enb_1_0_0),
         .wreg_enb_0_1(pe_matrix_wreg_enb_1_0_1),
@@ -408,7 +408,7 @@ module PE_matrix(
     
     PE_array pe_array_2 (
         .clk(clk), 
-        .reset(reset),
+        .resetn(resetn),
         
         .wreg_enb_0_0(pe_matrix_wreg_enb_2_0_0),
         .wreg_enb_0_1(pe_matrix_wreg_enb_2_0_1),

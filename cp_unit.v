@@ -22,7 +22,7 @@
 
 module cp_unit(
     input   clk,
-    input   reset,
+    input   resetn,
     input   enb,
 
     //ctrl sigs
@@ -55,7 +55,7 @@ module cp_unit(
     assign cp_do_012_max = (cp_do_01_max > cp_data_2) ? cp_do_01_max : cp_data_2 ;
 
     always @(posedge clk) begin
-        if (reset) begin
+        if (!resetn) begin
             cp_data_0 <= 0;
             cp_data_1 <= 0;
             cp_data_2 <= 0;

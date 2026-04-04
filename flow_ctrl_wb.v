@@ -22,7 +22,7 @@
 
 module flow_ctrl_wb(
         input clk,
-        input reset,
+        input resetn,
         input enb,
 
         input [3:0] cfg_layer_type,
@@ -113,7 +113,7 @@ module flow_ctrl_wb(
     end
 
     always @(posedge clk) begin
-        if (reset) begin
+        if (!resetn) begin
             wb_g_state <= GL_BEGIN;
             cnt <= 0;
             mem_write_state <= 0;

@@ -22,7 +22,7 @@
 
 module accel_lpe_reg(
         input clk,
-        input rst,
+        input rstn,
         input enb,
         input mac_ready,
         input [7:0] data_in_0, data_in_1, data_in_2, 
@@ -30,7 +30,7 @@ module accel_lpe_reg(
     );
     
     always @(posedge clk) begin
-        if (rst) begin
+        if (!rstn) begin
             data_out_0 <= 0;
             data_out_1 <= 0;
             data_out_2 <= 0;

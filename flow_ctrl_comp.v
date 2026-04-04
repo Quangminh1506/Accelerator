@@ -23,7 +23,7 @@
 module flow_ctrl_comp(
         input clk,
         input enb,
-        input reset,
+        input resetn,
 
         input [3:0] cfg_layer_type,
         input pe_matrix_ready,
@@ -66,7 +66,7 @@ module flow_ctrl_comp(
     reg first_cycle; //clear new
 
     always @(posedge clk) begin
-        if (reset) begin
+        if (!resetn) begin
             comp_g_state <= GL_BEGIN;
             first_cycle <= 0;
         end
@@ -152,7 +152,7 @@ module flow_ctrl_comp(
 
     //FF for next stage
     always @(posedge clk) begin
-        if (reset) begin
+        if (!resetn) begin
             comp_out_done = 0;
             comp_o_addr = 0;
             comp_ps_addr = 0;

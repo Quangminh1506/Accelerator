@@ -22,7 +22,7 @@
 
 module flow_ctrl(
         input clk,
-        input reset,
+        input resetn,
         input enb,
 
         input [3:0] cfg_layer_type,
@@ -155,7 +155,7 @@ module flow_ctrl(
 
   flow_ctrl_read read_ctrl(
     .clk (clk),
-    .reset(reset),
+    .resetn(resetn),
     .enb(enb),
 
     .cfg_layer_type(cfg_layer_type),
@@ -238,7 +238,7 @@ module flow_ctrl(
   flow_ctrl_comp comp_ctrl(
     .clk(clk),
     .enb(enb),
-    .reset(reset),
+    .resetn(resetn),
 
     .cfg_layer_type(cfg_layer_type),
     .pe_matrix_ready(ctrl_pe_matrix_ready),
@@ -269,7 +269,7 @@ module flow_ctrl(
 
   flow_ctrl_wb wb_ctrl(
     .clk(clk),
-    .reset(reset),
+    .resetn(resetn),
     .enb(enb),
 
     .cfg_layer_type(cfg_layer_type),

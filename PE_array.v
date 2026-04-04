@@ -22,7 +22,7 @@
 
 module PE_array(
         input clk,
-        input reset,
+        input resetn,
         
         //control signals
         input ireg_enb_0, ireg_enb_1, ireg_enb_2,
@@ -145,7 +145,7 @@ module PE_array(
 
         .enb    (ireg_enb_0),
         .clk    (clk),
-        .reset (reset)
+        .resetn (resetn)
     );
     
     pe_reg ireg_1 (
@@ -159,7 +159,7 @@ module PE_array(
 
         .enb    (ireg_enb_1),
         .clk    (clk),
-        .reset (reset)
+        .resetn (resetn)
     );
     
     pe_reg ireg_2 (
@@ -173,7 +173,7 @@ module PE_array(
 
         .enb    (ireg_enb_2),
         .clk    (clk),
-        .reset (reset)
+        .resetn (resetn)
     );
     
     //weight reg
@@ -188,7 +188,7 @@ module PE_array(
 
         .enb    (wreg_enb_0_0),
         .clk    (clk),
-        .reset (reset)
+        .resetn (resetn)
     );
     
     pe_reg wreg_0_1 (
@@ -202,7 +202,7 @@ module PE_array(
 
         .enb    (wreg_enb_0_1),
         .clk    (clk),
-        .reset (reset)
+        .resetn (resetn)
     );
     
     pe_reg wreg_0_2 (
@@ -216,7 +216,7 @@ module PE_array(
 
         .enb    (wreg_enb_0_2),
         .clk    (clk),
-        .reset (reset)
+        .resetn (resetn)
     );
     
     pe_reg wreg_1_0 (
@@ -230,7 +230,7 @@ module PE_array(
 
         .enb    (wreg_enb_1_0),
         .clk    (clk),
-        .reset (reset)
+        .resetn (resetn)
     );
     
     pe_reg wreg_1_1 (
@@ -244,7 +244,7 @@ module PE_array(
 
         .enb    (wreg_enb_1_1),
         .clk    (clk),
-        .reset (reset)
+        .resetn (resetn)
     );
     
     pe_reg wreg_1_2 (
@@ -258,7 +258,7 @@ module PE_array(
 
         .enb    (wreg_enb_1_2),
         .clk    (clk),
-        .reset (reset)
+        .resetn (resetn)
     );
     
     pe_reg wreg_2_0 (
@@ -272,7 +272,7 @@ module PE_array(
 
         .enb    (wreg_enb_2_0),
         .clk    (clk),
-        .reset (reset)
+        .resetn (resetn)
     );
     
     pe_reg wreg_2_1 (
@@ -286,7 +286,7 @@ module PE_array(
 
         .enb    (wreg_enb_2_1),
         .clk    (clk),
-        .reset (reset)
+        .resetn (resetn)
     );
     
     pe_reg wreg_2_2 (
@@ -300,13 +300,13 @@ module PE_array(
 
         .enb    (wreg_enb_2_2),
         .clk    (clk),
-        .reset (reset)
+        .resetn (resetn)
     );
     
     //PE units
     PE_unit pe_0 (
         .clk(clk), 
-        .rst(reset), 
+        .rstn(resetn), 
         .enb(pe_enb_0), 
         .pe_input_offset(pe_arr_input_offset),
         .pe_wdi_0_0(wreg_to_pe[0][0][0]), 
@@ -329,7 +329,7 @@ module PE_array(
     
     PE_unit pe_1 (
         .clk(clk), 
-        .rst(reset), 
+        .rstn(resetn), 
         .enb(pe_enb_1), 
         .pe_input_offset(pe_arr_input_offset),
         .pe_wdi_0_0(wreg_to_pe[1][0][0]), 
@@ -352,7 +352,7 @@ module PE_array(
     
     PE_unit pe_2(
         .clk(clk), 
-        .rst(reset), 
+        .rstn(resetn), 
         .enb(pe_enb_2), 
         .pe_input_offset(pe_arr_input_offset),
         .pe_wdi_0_0(wreg_to_pe[2][0][0]), 

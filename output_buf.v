@@ -22,7 +22,7 @@
 
 module output_buf(
         input clk,
-        input reset,
+        input resetn,
         input enb,
         
         input [31:0] obuf_di,
@@ -32,7 +32,7 @@ module output_buf(
     );
 
     always @(posedge clk) begin
-        if (reset) begin
+        if (!resetn) begin
             obuf_do <= 0;
         end
         else begin

@@ -22,7 +22,7 @@
 
 module elw_unit(
         input clk,
-        input reset,
+        input resetn,
         
        //ctrl sigs
         input   quant_act_func_enb_0,
@@ -109,7 +109,7 @@ module elw_unit(
 
     quant_unit quant_unit_0 (
         .clk   (clk),
-        .reset (reset),
+        .resetn (resetn),
         .enb    (quant_act_func_enb_0),
 
         .quant_di       (elew_di_0_0),
@@ -167,7 +167,7 @@ module elw_unit(
 
     quant_unit quant_unit_1 (
         .clk   (clk),
-        .reset (reset),
+        .resetn (resetn),
         .enb   (quant_act_func_enb_1),
         
         .quant_di       (elew_di_0_1),
@@ -225,7 +225,7 @@ module elw_unit(
 
     quant_unit quant_unit_2 (
         .clk   (clk),
-        .reset (reset),
+        .resetn (resetn),
         .enb   (quant_act_func_enb_2),
         
         .quant_di       (elew_di_0_2),
@@ -262,7 +262,7 @@ module elw_unit(
     //compare unit
     cp_unit cp_unit (
         .clk   (clk),
-        .reset (reset),
+        .resetn (resetn),
         .enb   (cp_enb),
 
         .cp_di_0    (elew_di_1_0),

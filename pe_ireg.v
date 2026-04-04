@@ -23,7 +23,7 @@
 module pe_reg(
     input   enb,
     input   clk,
-    input   reset,
+    input   resetn,
 
     input   [7:0] reg_di_0,
     input   [7:0] reg_di_1,
@@ -37,7 +37,7 @@ module pe_reg(
     reg [7:0] idata_0, idata_1, idata_2;
 
     always @(posedge clk) begin
-        if (reset) begin
+        if (!resetn) begin
             idata_0 <= 0;
             idata_1 <= 0;
             idata_2 <= 0;

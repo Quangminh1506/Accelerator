@@ -22,7 +22,7 @@
 
 module flow_ctrl_read(
         input clk,
-        input reset,
+        input resetn,
         input enb,
 
         //layer data
@@ -285,7 +285,7 @@ module flow_ctrl_read(
     end
                
     always @(posedge clk) begin
-        if (reset) begin
+        if (!resetn) begin
             read_g_state <= GL_BEGIN;
             read_weight_state <= WREAD_0;
             read_input_state <= I_BEGIN;
@@ -564,7 +564,7 @@ module flow_ctrl_read(
     
     //control sigs           
     always @(posedge clk) begin
-        if (reset) begin
+        if (!resetn) begin
             stride_cnt <= 0;
             x_in <= 0;
             y_in <= 0;
@@ -2357,7 +2357,7 @@ module flow_ctrl_read(
 
     //FF for next stage
     always @(posedge clk) begin
-        if (reset) begin
+        if (!resetn) begin
             read_out_done <= 0;
             read_ps_addr <= 0;
             read_o_addr <= 0;

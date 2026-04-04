@@ -23,7 +23,7 @@
 module PE_unit
 (
         input clk,
-        input rst,
+        input rstn,
         input enb,
         input [31:0] pe_input_offset,
         input [7:0] pe_wdi_0_0, pe_wdi_0_1, pe_wdi_0_2, pe_wdi_1_0, pe_wdi_1_1, pe_wdi_1_2, pe_wdi_2_0, pe_wdi_2_1, pe_wdi_2_2,
@@ -43,7 +43,7 @@ module PE_unit
     // inst 0
     accel_lpe_reg lpe_0 (
         .clk (clk),
-        .rst (rst),
+        .rstn (rstn),
         .enb (enb),
         .mac_ready(mac_load_0),
         .data_in_0 (pe_wdi_0_0),
@@ -56,7 +56,7 @@ module PE_unit
 
     accel_mac mac_0 (
         .clk (clk),
-        .rst (rst),
+        .rstn (rstn),
         .enb (enb),
         .input_offset (pe_input_offset),
         .idi_0 (pe_idi_0),
@@ -73,7 +73,7 @@ module PE_unit
     // inst 1
     accel_lpe_reg lpe_1 (
         .clk (clk),
-        .rst (rst),
+        .rstn (rstn),
         .enb (enb),
         .mac_ready(mac_load_1),
         .data_in_0 (pe_wdi_1_0),
@@ -86,7 +86,7 @@ module PE_unit
     
     accel_mac mac_1 (
         .clk (clk),
-        .rst (rst),
+        .rstn (rstn),
         .enb (enb),
         .input_offset (pe_input_offset),
         .idi_0 (pe_idi_0),
@@ -103,7 +103,7 @@ module PE_unit
     // inst 2
     accel_lpe_reg lpe_2 (
         .clk (clk),
-        .rst (rst),
+        .rstn (rstn),
         .enb (enb),
         .mac_ready(mac_load_2),
         .data_in_0 (pe_wdi_2_0),
@@ -116,7 +116,7 @@ module PE_unit
     
     accel_mac mac_2 (
         .clk (clk),
-        .rst (rst),
+        .rstn (rstn),
         .enb (enb),
         .input_offset (pe_input_offset),
         .idi_0 (pe_idi_0),

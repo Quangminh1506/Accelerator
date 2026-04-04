@@ -21,7 +21,7 @@
 
 module main_accel(
         input clk,
-        input reset,
+        input resetn,
 
         input accel_cfgreg_write_enb,
         input [31:0] accel_cfgreg_di,
@@ -32,7 +32,7 @@ module main_accel(
         input accel_mem_write_ready,
 
         input accel_ctrl_enb,
-        input accel_ctrl_reset,
+        input accel_ctrl_resetn,
 
         output accel_read_enb,
         output [31:0] accel_read_addr,
@@ -179,7 +179,7 @@ module main_accel(
     bias_point_buf bpbuf0(
         .clk(clk),
         .enb(bpbuf0_enb && accel_ctrl_enb),
-        .reset(reset && accel_ctrl_reset),
+        .resetn(resetn && accel_ctrl_resetn),
 
         .bpbuf_ld(bpbuf0_ld),
         .bpbuf_di(accel_read_data),
@@ -189,7 +189,7 @@ module main_accel(
     bias_point_buf bpbuf1(
         .clk(clk),
         .enb(bpbuf1_enb && accel_ctrl_enb),
-        .reset(reset && accel_ctrl_reset),
+        .resetn(resetn && accel_ctrl_resetn),
 
         .bpbuf_ld(bpbuf1_ld),
         .bpbuf_di(accel_read_data),
@@ -199,7 +199,7 @@ module main_accel(
     bias_point_buf bpbuf2(
         .clk(clk),
         .enb(bpbuf2_enb && accel_ctrl_enb),
-        .reset(reset && accel_ctrl_reset),
+        .resetn(resetn && accel_ctrl_resetn),
 
         .bpbuf_ld(bpbuf2_ld),
         .bpbuf_di(accel_read_data),
@@ -210,7 +210,7 @@ module main_accel(
     input_buf ibuf0(
         .clk(clk),
         .enb(ibuf0_enb && accel_ctrl_enb),
-        .reset(reset && accel_ctrl_reset),
+        .resetn(resetn && accel_ctrl_resetn),
 
         .cfg_layer_type(cfg_layer_type),
         .ibuf_dense_wstrb(ibuf_dense_wstrb),
@@ -237,7 +237,7 @@ module main_accel(
     input_buf ibuf1(
         .clk(clk),
         .enb(ibuf1_enb && accel_ctrl_enb),
-        .reset(reset && accel_ctrl_reset),
+        .resetn(resetn && accel_ctrl_resetn),
 
         .cfg_layer_type(cfg_layer_type),
         .ibuf_dense_wstrb(ibuf_dense_wstrb),
@@ -264,7 +264,7 @@ module main_accel(
     input_buf ibuf2(
         .clk(clk),
         .enb(ibuf2_enb && accel_ctrl_enb),
-        .reset(reset && accel_ctrl_reset),
+        .resetn(resetn && accel_ctrl_resetn),
 
         .cfg_layer_type(cfg_layer_type),
         .ibuf_dense_wstrb(ibuf_dense_wstrb),
@@ -291,7 +291,7 @@ module main_accel(
     //weight buffers
     weight_buf wbuf0(
         .clk(clk),
-        .reset(reset && accel_ctrl_reset),
+        .resetn(resetn && accel_ctrl_resetn),
         .enb(wbuf0_enb && accel_ctrl_enb),
 
         .wbuf_di(accel_read_data),
@@ -306,7 +306,7 @@ module main_accel(
 
     weight_buf wbuf1(
         .clk(clk),
-        .reset(reset && accel_ctrl_reset),
+        .resetn(resetn && accel_ctrl_resetn),
         .enb(wbuf1_enb && accel_ctrl_enb),
 
         .wbuf_di(accel_read_data),
@@ -321,7 +321,7 @@ module main_accel(
 
     weight_buf wbuf2(
         .clk(clk),
-        .reset(reset && accel_ctrl_reset),
+        .resetn(resetn && accel_ctrl_resetn),
         .enb(wbuf2_enb && accel_ctrl_enb),
 
         .wbuf_di(accel_read_data),
@@ -337,7 +337,7 @@ module main_accel(
     //computation matrix
     PE_matrix pe_matrix (
         .clk(clk),
-        .reset(reset && accel_ctrl_reset),
+        .resetn(resetn && accel_ctrl_resetn),
         .matrix_is_conv_layer(cfg_layer_type == CONV),
         .matrix_conv_dir(pe_matrix_conv_dir),
         .matrix_input_offset(input_offset),
@@ -452,7 +452,7 @@ module main_accel(
     //accumulate matrix
     acc_matrix acc_matrix(
         .clk(clk),
-        .reset(reset && accel_ctrl_reset),
+        .resetn(resetn && accel_ctrl_resetn),
         .enb((acc_matrix_enb0 | acc_matrix_enb1) & accel_ctrl_enb),
 
         .acc_matrix_bps_load(acc_matrix_bp_ld),
@@ -499,7 +499,7 @@ module main_accel(
     //output buffers
     output_buf obuf0(
         .clk(clk),
-        .reset(reset && accel_ctrl_reset),
+        .resetn(resetn && accel_ctrl_resetn),
         .enb(obuf0_enb && accel_ctrl_enb),
 
         .obuf_di(obuf0_di),
@@ -510,7 +510,7 @@ module main_accel(
 
     output_buf obuf1(
         .clk(clk),
-        .reset(reset && accel_ctrl_reset),
+        .resetn(resetn && accel_ctrl_resetn),
         .enb(obuf1_enb && accel_ctrl_enb),
 
         .obuf_di(obuf1_di),
@@ -521,7 +521,7 @@ module main_accel(
 
     output_buf obuf2(
         .clk(clk),
-        .reset(reset && accel_ctrl_reset),
+        .resetn(resetn && accel_ctrl_resetn),
         .enb(obuf2_enb && accel_ctrl_enb),
 
         .obuf_di(obuf2_di),
@@ -533,7 +533,7 @@ module main_accel(
     //element wise unit
     elw_unit elw_unit(
         .clk(clk),
-        .reset(reset && accel_ctrl_reset),
+        .resetn(resetn && accel_ctrl_resetn),
 
         .quant_act_func_enb_0(quant_act_func_enb0 && accel_ctrl_enb),
         .quant_act_func_enb_1(quant_act_func_enb1 && accel_ctrl_enb),
@@ -575,7 +575,7 @@ module main_accel(
 
     config_regs config_regs(
         .clk(clk),
-        .reset(reset && accel_ctrl_reset),
+        .resetn(resetn && accel_ctrl_resetn),
 
         .config_wen(accel_cfgreg_write_enb),
         .config_data(accel_cfgreg_di),
@@ -675,7 +675,7 @@ module main_accel(
 
     flow_ctrl flow_ctrl(
         .clk(clk),
-        .reset(reset),
+        .resetn(resetn),
         .enb(accel_ctrl_enb),
 
         .cfg_layer_type(cfg_layer_type),
