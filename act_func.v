@@ -29,7 +29,7 @@ module act_func(
     localparam RELU    = 4'd0,
                RELU6   = 4'd1;
  
-    reg [7:0] act_func_data;
+    reg [31:0] act_func_data;
     always @(*) begin
         act_func_data = act_func_di;
         case (act_func_type)

@@ -272,7 +272,8 @@ module elw_unit(
         .cp_clr     (cp_clr),
         .cp2h_enb   (cp2h_enb),
         .cp2w_enb   (cp2w_enb),
-        
+        .elew_act_func_type (elew_act_func_type),
+
         .cp_do      (elew_do_1)
     );
     
@@ -281,8 +282,37 @@ module elw_unit(
     assign acc_sub_offset_1 = act_func_do_1 - elew_output_offset;
     assign acc_sub_offset_2 = act_func_do_2 - elew_output_offset;
 
-    assign elew_do_0_0 = acc_sub_offset_0[7:0];
-    assign elew_do_0_1 = acc_sub_offset_1[7:0];
-    assign elew_do_0_2 = acc_sub_offset_2[7:0];
+    reg [7:0] out_0, out_1, out_2;
+
+    always @* begin
+        if (elew_act_func_type == 4'd0) begin
+            if (acc_sub_offset_0 > 255) out_0 = 8'hFF;
+            else out_0 = acc_sub_offset_0[7:0];
+
+            if (acc_sub_offset_1 > 255) out_1 = 8'hFF;
+            else out_1 = acc_sub_offset_1[7:0];
+
+            if (acc_sub_offset_2 > 255) out_2 = 8'hFF;
+            else out_2 = acc_sub_offset_2[7:0];
+
+        end
+        else begin
+            if ($signed(acc_sub_offset_0) < -128) out_0 = 8'h80;
+            else if ($signed(acc_sub_offset_0) > 127) out_0 = 8'h7F;
+            else out_0 = acc_sub_offset_0[7:0];
+
+            if ($signed(acc_sub_offset_1) < -128) out_1 = 8'h80;
+            else if ($signed(acc_sub_offset_1) > 127) out_1 = 8'h7F;
+            else out_1 = acc_sub_offset_1[7:0];
+
+            if ($signed(acc_sub_offset_2) < -128) out_2 = 8'h80;
+            else if ($signed(acc_sub_offset_2) > 127) out_2 = 8'h7F;
+            else out_2 = acc_sub_offset_2[7:0];
+        end
+    end
+
+    assign elew_do_0_0 = out_0;
+    assign elew_do_0_1 = out_1;
+    assign elew_do_0_2 = out_2;
     
 endmodule

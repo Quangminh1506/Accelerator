@@ -29,7 +29,9 @@ module cp_unit(
     input cp_clr,
     input cp2h_enb,
     input cp2w_enb,
-    
+
+    input [3:0] elew_act_func_type,
+
     //data sigs
     input [7:0] cp_di_0,
     input [7:0] cp_di_1,
@@ -39,20 +41,25 @@ module cp_unit(
     output        [7:0] cp_do
 
 );
-
     reg [7:0] cp_data_2, cp_data_1, cp_data_0;
-    
+
+    wire cp_is_unsigned = (elew_act_func_type == 0 || elew_act_func_type == 1);
+
     wire [7:0] cp_di_01_max;
-    assign cp_di_01_max  = (cp_di_0 > cp_di_1) ? cp_di_0 : cp_di_1 ;
+    assign cp_di_01_max  = cp_is_unsigned ? ((cp_di_0 > cp_di_1) ? cp_di_0 : cp_di_1) :
+                                            (($signed(cp_di_0) > $signed(cp_di_1)) ? cp_di_0 : cp_di_1);
 
     wire [7:0] cp_di_012_max;
-    assign cp_di_012_max = (cp_di_01_max > cp_di_2) ? cp_di_01_max : cp_di_2 ;
+    assign cp_di_012_max = cp_is_unsigned ? ((cp_di_01_max > cp_di_2) ? cp_di_01_max : cp_di_2) :
+                                            (($signed(cp_di_01_max) > $signed(cp_di_2)) ? cp_di_01_max : cp_di_2);
 
     wire [7:0] cp_do_01_max;
-    assign cp_do_01_max  = (cp_data_0 > cp_data_1) ? cp_data_0 : cp_data_1 ;
+    assign cp_do_01_max  = cp_is_unsigned ? ((cp_data_0 > cp_data_1) ? cp_data_0 : cp_data_1) :
+                                            (($signed(cp_data_0) > $signed(cp_data_1)) ? cp_data_0 : cp_data_1);
 
     wire [7:0] cp_do_012_max;
-    assign cp_do_012_max = (cp_do_01_max > cp_data_2) ? cp_do_01_max : cp_data_2 ;
+    assign cp_do_012_max = cp_is_unsigned ? ((cp_do_01_max > cp_data_2) ? cp_do_01_max : cp_data_2) :
+                                            (($signed(cp_do_01_max) > $signed(cp_data_2)) ? cp_do_01_max : cp_data_2);
 
     always @(posedge clk) begin
         if (!resetn) begin
