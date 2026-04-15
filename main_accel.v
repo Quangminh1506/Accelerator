@@ -675,7 +675,7 @@ module main_accel(
 
     flow_ctrl flow_ctrl(
         .clk(clk),
-        .resetn(resetn),
+        .resetn(resetn && accel_ctrl_resetn),
         .enb(accel_ctrl_enb),
 
         .cfg_layer_type(cfg_layer_type),
