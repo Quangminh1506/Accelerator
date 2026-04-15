@@ -43,6 +43,23 @@ module accel_mac(
                MAC1 = 2'd2,
                MAC2 = 2'd3;
     
+    reg [7:0] ridi_0, ridi_1, ridi_2;
+
+    always @(posedge clk) begin
+        if (!rstn) begin
+            ridi_0 <= 0;
+            ridi_1 <= 0;
+            ridi_2 <= 0;
+        end
+        else if (enb) begin
+            if (mac_load) begin
+                ridi_0 <= idi_0;
+                ridi_1 <= idi_1;
+                ridi_2 <= idi_2;
+            end
+        end
+    end
+
     always @(*) begin
         case(state)
             IDLE: begin
@@ -53,19 +70,19 @@ module accel_mac(
             end
         
             MAC0: begin 
-                mux_idi = idi_0; 
+                mux_idi = ridi_0; 
                 mux_wdi = wdi_0;
                 mac_load = 0; 
                 ready = 0;
             end 
             MAC1: begin
-                mux_idi = idi_1; 
+                mux_idi = ridi_1; 
                 mux_wdi = wdi_1; 
                 mac_load = 0; 
                 ready = 0;
             end 
             MAC2: begin 
-                mux_idi = idi_2; 
+                mux_idi = ridi_2; 
                 mux_wdi = wdi_2; 
                 mac_load = 0; 
                 ready = 1;
