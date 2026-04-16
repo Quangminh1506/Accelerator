@@ -821,7 +821,7 @@ module flow_ctrl_read(
                                         z_kw_in <= 0;
                                         z_kw_num_out <= z_kw_num_out + 3;
                                         i_addr0_0 <= i_base_addr;
-                                        kw_addr0_0 <= kw_addr2_2 + 9;
+                                        kw_addr0_0 <= kw_addr2_0 + kernel3D_size;
                                     end 
                                     else begin
                                         z_kw_in <= z_kw_in + 3;
