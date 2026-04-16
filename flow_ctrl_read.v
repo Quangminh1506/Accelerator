@@ -203,36 +203,45 @@ module flow_ctrl_read(
     reg is_out_done;
     
     //pre calculate address
-    reg [15:0] w_ifm_x_h_stride_left;
 
-    always @* begin
-        w_ifm_x_h_stride_left = 1;
-        case (h_stride) 
-            4'd1: w_ifm_x_h_stride_left = kernel3D_size + 1;
-            4'd2: w_ifm_x_h_stride_left = kernel3D_size + 1 + w_ifm;
-            4'd3: w_ifm_x_h_stride_left = kernel3D_size + 1 + w_ifm + w_ifm;
-        endcase
-    end
+    wire [3:0] s_val = h_stride - 1;
 
-    reg [15:0] w_ifm_x_padding;
-    reg [15:0] w_ifm_x_kernel_height_left;
-    always @* begin
-        w_ifm_x_padding = 0;
-        case (kernel3D_size)
-            4'd1: w_ifm_x_padding = w_ifm;
-            4'd2: w_ifm_x_padding = w_ifm + w_ifm;
-        endcase 
-    end
+    wire [15:0] dynamic_row_jump_offset;
+    assign dynamic_row_jump_offset = (s_val[0] ? (w_ifm) : 16'd0) +
+                                     (s_val[1] ? (w_ifm << 1) : 16'd0) +
+                                     (s_val[2] ? (w_ifm << 2) : 16'd0) +
+                                     (s_val[3] ? (w_ifm << 3) : 16'd0);
 
-    // jump = (kernel_w - 1) x w_ifm + k + pad
-    always @* begin
-        w_ifm_x_kernel_height_left = 0;
-        case (weight_kernel_width) 
-            4'd1: w_ifm_x_kernel_height_left = kernel3D_size + 1 + w_ifm_x_padding;
-            4'd2: w_ifm_x_kernel_height_left = kernel3D_size + 1 + w_ifm_x_padding + w_ifm;
-            4'd3: w_ifm_x_kernel_height_left = kernel3D_size + 1 + w_ifm_x_padding + w_ifm + w_ifm;
-        endcase
-    end
+    // reg [15:0] w_ifm_x_h_stride_left;
+
+    // always @* begin
+    //     w_ifm_x_h_stride_left = 1;
+    //     case (h_stride) 
+    //         4'd1: w_ifm_x_h_stride_left = kernel3D_size + 1;
+    //         4'd2: w_ifm_x_h_stride_left = kernel3D_size + 1 + w_ifm;
+    //         4'd3: w_ifm_x_h_stride_left = kernel3D_size + 1 + w_ifm + w_ifm;
+    //     endcase
+    // end
+
+    // reg [15:0] w_ifm_x_padding;
+    // reg [15:0] w_ifm_x_kernel_height_left;
+    // always @* begin
+    //     w_ifm_x_padding = 0;
+    //     case (kernel3D_size)
+    //         4'd1: w_ifm_x_padding = w_ifm;
+    //         4'd2: w_ifm_x_padding = w_ifm + w_ifm;
+    //     endcase 
+    // end
+
+    // // jump = (kernel_w - 1) x w_ifm + k + pad
+    // always @* begin
+    //     w_ifm_x_kernel_height_left = 0;
+    //     case (weight_kernel_width) 
+    //         4'd1: w_ifm_x_kernel_height_left = kernel3D_size + 1 + w_ifm_x_padding;
+    //         4'd2: w_ifm_x_kernel_height_left = kernel3D_size + 1 + w_ifm_x_padding + w_ifm;
+    //         4'd3: w_ifm_x_kernel_height_left = kernel3D_size + 1 + w_ifm_x_padding + w_ifm + w_ifm;
+    //     endcase
+    // end
 
     //counter
     reg [4:0] cnt,stride_cnt;
@@ -882,12 +891,12 @@ module flow_ctrl_read(
                                         x_in <= 0;
                                         y_in <= 0;
                                         z_kw_in <= z_kw_in + 1;
-                                        i_addr0_0 <= i_addr0_0 + w_ifm_x_kernel_height_left;
+                                        i_addr0_0 <= i_base_addr + (z_kw_in + 1) * in2D_size;
                                     end
                                     else begin
                                         x_in <= 0;
                                         y_in <= y_in + h_stride;
-                                        i_addr0_0 <= i_addr0_0 + w_ifm_x_h_stride_left;
+                                        i_addr0_0 <= i_addr0_0 + (w_ifm - x_in) + dynamic_row_jump_offset;
                                     end
                                 end
                                 else begin
