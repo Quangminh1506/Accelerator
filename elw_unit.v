@@ -286,13 +286,13 @@ module elw_unit(
 
     always @* begin
         if (elew_act_func_type == 4'd0) begin
-            if (acc_sub_offset_0 > 255) out_0 = 8'hFF;
+            if (acc_sub_offset_0 > 127) out_0 =8'h7F;
             else out_0 = acc_sub_offset_0[7:0];
 
-            if (acc_sub_offset_1 > 255) out_1 = 8'hFF;
+            if (acc_sub_offset_1 > 127) out_1 = 8'h7F;
             else out_1 = acc_sub_offset_1[7:0];
 
-            if (acc_sub_offset_2 > 255) out_2 = 8'hFF;
+            if (acc_sub_offset_2 > 127) out_2 = 8'h7F;
             else out_2 = acc_sub_offset_2[7:0];
 
         end

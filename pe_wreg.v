@@ -23,7 +23,7 @@
 module pe_wreg(
     input   enb,
     input   clk,
-    input   resetn,
+    input   reset,
 
     input   [7:0] wreg_di_0,
     input   [7:0] wreg_di_1,
@@ -35,7 +35,7 @@ module pe_wreg(
 
 );   
     always @(posedge clk) begin
-        if (!resetn) begin
+        if (reset) begin
             wreg_do_0 <= 0;
             wreg_do_1 <= 0;
             wreg_do_2 <= 0;
