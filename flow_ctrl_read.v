@@ -571,6 +571,8 @@ module flow_ctrl_read(
     reg [31:0] process_o_addr;
     reg [31:0] process_quant_sel;
     
+    reg [31:0] kw_addr_block_start;
+    reg [31:0] i_addr_block_start;
     //control sigs           
     always @(posedge clk) begin
         if (!resetn) begin
@@ -589,6 +591,9 @@ module flow_ctrl_read(
             kw_addr0_0 <= 0;
             o_quant_sel <= 0;
             
+            kw_addr_block_start <= 0;
+            i_addr_block_start <= 0;
+
             process_ps_addr <= 0;
             process_o_addr <= 0;
             process_quant_sel <= 0;
@@ -611,6 +616,9 @@ module flow_ctrl_read(
                             //y_out <= 0;
                             z_kw_in <= 0;
                             z_kw_num_out <= 0;
+
+                            kw_addr_block_start <= kw_base_addr;
+                            i_addr_block_start <= i_base_addr;
 
                             bp_addr0 <= bp_base_addr;
                             kw_addr0_0 <= kw_base_addr;
@@ -697,13 +705,13 @@ module flow_ctrl_read(
                             process_o_addr <= o_addr0;
                             case (read_input_state) 
                                 I_BEGIN: begin
-                                    if (cnt < 2) begin
-                                        cnt <= cnt + 1;
-                                    end
-                                    else begin
+                                    if (cnt >= 2) begin
                                         ps_addr0[31:2] <= ps_addr0[31:2] + 1;
                                         if (is_out_done) o_addr0 <= o_addr0 + 1;
                                         cnt <= 0;
+                                    end
+                                    else begin
+                                        cnt <= cnt + 1;
                                     end
                                 end
                                 
@@ -720,12 +728,13 @@ module flow_ctrl_read(
                                                     if (is_out_done) begin
                                                         o_addr0 <= o_addr2 + 1;
                                                         o_quant_sel <= o_quant_sel + 1;
-                                                    end    
+                                                    end
                                                     
                                                 end
                                                 else begin //done 1 kernel
                                                     ps_addr0[31:2] <= ps_addr0[31:2] - out2D_size + 1;
                                                 end
+                                                // cnt <= 0;
                                             end
                                             else begin //not done down 
                                                 ps_addr0[31:2] <= ps_addr0[31:2] + w_ofm;
@@ -757,12 +766,13 @@ module flow_ctrl_read(
                                                     if (is_out_done) begin
                                                         o_addr0 <= o_addr2 + w_ofm;
                                                         o_quant_sel <= o_quant_sel + 1;
-                                                    end    
+                                                    end
                                                     
                                                 end
                                                 else begin //done 1 kernel
-                                                    ps_addr0[31:2] <= ps_addr0[31:2] - out2D_size + 1;
+                                                    ps_addr0[31:2] <= ps_addr0[31:2] - out2D_size + w_ofm;  
                                                 end
+                                                // cnt <= 0;
                                             end
                                             else begin //not done down
                                                 ps_addr0[31:2] <= ps_addr0[31:2] + w_ofm;
@@ -791,6 +801,7 @@ module flow_ctrl_read(
                                         if (is_out_done && stride_cnt >= h_stride - 1) begin
                                             o_addr0 <= o_addr0 - 1;
                                         end
+                                        //cnt <= 0;
                                         stride_cnt <= 0;
                                     end
                                     else begin
@@ -807,6 +818,7 @@ module flow_ctrl_read(
                                         if (is_out_done) begin
                                             o_addr0 <= o_addr0 + 1;
                                         end
+                                        cnt <= 0;
                                         stride_cnt <= 0;
                                     end
                                     else stride_cnt <= stride_cnt + 1;
@@ -821,7 +833,7 @@ module flow_ctrl_read(
                                     y_in <= 0;
                                     x_out <= 0;
                                     //y_out <= 0;
-                                    
+                                    //cnt <= 0;
                                     if (z_kw_in < 3) begin
                                         bp_addr0 <= bp_addr0 + 12;
                                     end
@@ -829,18 +841,24 @@ module flow_ctrl_read(
                                     if (z_kw_in + 3 >= kernel_ifm_depth) begin
                                         z_kw_in <= 0;
                                         z_kw_num_out <= z_kw_num_out + 3;
+
+                                        i_addr_block_start <= i_base_addr;
                                         i_addr0_0 <= i_base_addr;
-                                        kw_addr0_0 <= kw_addr2_0 + kernel3D_size;
+                                        // kw_addr0_0 <= kw_addr2_0 + kernel3D_size;
+                                        kw_addr_block_start <= kw_addr_block_start + kernel3D_size + kernel3D_size + kernel3D_size;
+                                        kw_addr0_0 <= kw_addr_block_start + kernel3D_size + kernel3D_size + kernel3D_size;
                                     end 
                                     else begin
                                         z_kw_in <= z_kw_in + 3;
                                         kw_addr0_0 <= kw_addr0_2 + 9;
-                                        if (read_input_state == I_LEFT_DONE) begin
-                                            i_addr0_0 <= i_addr2_2 + weight_kernel_width;
-                                        end
-                                        else begin
-                                            i_addr0_0 <= i_addr2_2 + w_ifm;
-                                        end
+                                        i_addr_block_start <= i_addr_block_start + in2D_size + in2D_size + in2D_size;
+                                        i_addr0_0 <= i_addr_block_start + in2D_size + in2D_size + in2D_size;
+                                        // if (read_input_state == I_LEFT_DONE) begin
+                                        //     i_addr0_0 <= i_addr2_2 + weight_kernel_width;
+                                        // end
+                                        // else begin
+                                        //     i_addr0_0 <= i_addr2_2 + w_ifm;
+                                        // end
                                     end
                                 end
                             end    
@@ -1794,7 +1812,7 @@ module flow_ctrl_read(
                     end
                     
                     GL_ILOAD: begin
-                        ibuf_enb = 3'b111;
+                        ibuf_enb = 3'b111; 
                         ibuf_ld = 3'b000;
                         case (read_input_state) 
                             I_BEGIN: begin
