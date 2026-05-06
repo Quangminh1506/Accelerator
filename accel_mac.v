@@ -106,7 +106,7 @@ module accel_mac(
     wire [7:0] us_wdi    = wdi_sign ? (~mux_wdi + 1'b1) : mux_wdi;
     
     wire [15:0] prod;
-    M8_CP13_2 mult (
+    M8_CP24_6 mult (
         .A(us_idi),
         .B(us_wdi),
         .P(prod)
