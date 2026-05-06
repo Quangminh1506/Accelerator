@@ -358,6 +358,7 @@ module axi_wrapper #(
     end
 
     always @(*) begin
+        n_w_state = c_w_state;
         case(c_w_state)
             W_IDLE: begin
                 if (int_write_enb) begin
