@@ -153,16 +153,16 @@ module flow_ctrl_comp(
     //FF for next stage
     always @(posedge clk) begin
         if (!resetn) begin
-            comp_out_done = 0;
-            comp_o_addr = 0;
-            comp_ps_addr = 0;
-            comp_o_quant_sel = 0;
+            comp_out_done <= 0;
+            comp_o_addr <= 0;
+            comp_ps_addr <= 0;
+            comp_o_quant_sel <= 0;
         end
         else if ((read_ready || read_done) && (wb_ready || wb_start) && comp_ready && enb) begin
-            comp_out_done = read_out_done;
-            comp_o_addr = read_o_addr;
-            comp_ps_addr = read_ps_addr;
-            comp_o_quant_sel = read_o_quant_sel;
+            comp_out_done <= read_out_done;
+            comp_o_addr <= read_o_addr;
+            comp_ps_addr <= read_ps_addr;
+            comp_o_quant_sel <= read_o_quant_sel;
         end
     end
 

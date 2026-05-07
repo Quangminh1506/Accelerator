@@ -55,6 +55,9 @@ module quant_unit(
     wire [63:0] quant_udi;
     reg [31:0] quant_di_reg;
     
+    reg quant_sdi_pipe;
+    reg valid_pipe;
+    
     reg [63:0] quant_mul_result;
     reg [63:0] quant_mul_acc;
     reg [3:0] quant_sel;
@@ -62,8 +65,7 @@ module quant_unit(
 
     reg  [3:0] state;
 
-    wire [31:0] quant_shift_result;
-
+    reg [31:0] quant_shift_result;
     // Convert Signed to Unsigned
     assign  quant_sdi = quant_di_reg[31];
     assign  quant_udi = (quant_sdi) ? ~quant_di_reg + 1 : quant_di_reg;
@@ -183,14 +185,28 @@ module quant_unit(
     
     // RoundingDivideByPOT     
     wire [31:0] mask, remainder, threshold;
-
+    
+    
     assign mask = (1 << quant_rshift) - 1;
     assign remainder = quant_himul_result & mask;
     assign threshold = (mask >> 1);
-
-    assign quant_shift_result = (remainder > threshold) ? ((quant_himul_result >> quant_rshift) + 1) : (quant_himul_result >> quant_rshift);
+    always @(posedge clk) begin
+        if (!resetn) begin
+            quant_shift_result <= 0;
+            quant_sdi_pipe <= 0;    // Reset thanh ghi dấu
+            valid_pipe <= 0;        // Reset thanh ghi valid
+        end 
+        else if (enb) begin
+            quant_shift_result <= (remainder > threshold) ? ((quant_himul_result >> quant_rshift) + 1) : (quant_himul_result >> quant_rshift);           
+            quant_sdi_pipe <= quant_sdi;          
+            valid_pipe <= (state == STAGE8); 
+        end
+    end
+    //assign quant_shift_result = (remainder > threshold) ? ((quant_himul_result >> quant_rshift) + 1) : (quant_himul_result >> quant_rshift);
 
     // Output value
-    assign quant_do = (quant_sdi) ? ~quant_shift_result + 1 : quant_shift_result;
-    assign valid = (state == STAGE8);
+//    assign quant_do = (quant_sdi) ? ~quant_shift_result + 1 : quant_shift_result;
+//    assign valid = (state == STAGE8);
+    assign quant_do = (quant_sdi_pipe) ? ~quant_shift_result + 1 : quant_shift_result;
+    assign valid = valid_pipe;
 endmodule

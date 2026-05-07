@@ -876,6 +876,7 @@ module flow_ctrl_read(
                             y_in <= 0;
                             
                             i_addr0_0 <= i_base_addr;
+                            i_addr_block_start <= i_base_addr;
                             o_addr0 <= o_base_addr;
 
                             mem_read_state <= 0;
@@ -909,7 +910,9 @@ module flow_ctrl_read(
                                         x_in <= 0;
                                         y_in <= 0;
                                         z_kw_in <= z_kw_in + 1;
-                                        i_addr0_0 <= i_base_addr + (z_kw_in + 1) * in2D_size;
+                                        i_addr_block_start <= i_base_addr + in2D_size;
+                                        i_addr0_0 <= i_addr_block_start + in2D_size;
+                                        //i_addr0_0 <= i_base_addr + (z_kw_in + 1) * in2D_size;
                                     end
                                     else begin
                                         x_in <= 0;
