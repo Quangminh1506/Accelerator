@@ -37,12 +37,17 @@ module accel_mac(
     reg [7:0] mux_idi;
     reg [7:0] mux_wdi;
 
-    reg [1:0] state;
-    localparam IDLE = 2'd0,
-               MAC0 = 2'd1,
-               MAC1 = 2'd2,
-               MAC2 = 2'd3;
-    
+    reg [2:0] state;
+//    localparam IDLE = 2'd0,
+//               MAC0 = 2'd1,
+//               MAC1 = 2'd2,
+//               MAC2 = 2'd3;
+    localparam IDLE  = 3'd0,
+               PIPE1 = 3'd1, 
+               PIPE2 = 3'd2, 
+               MAC0  = 3'd3, 
+               MAC1  = 3'd4, 
+               MAC2  = 3'd5; 
     reg [7:0] ridi_0, ridi_1, ridi_2;
 
     always @(posedge clk) begin
@@ -60,42 +65,73 @@ module accel_mac(
         end
     end
 
+//    always @(*) begin
+//        case(state)
+//            IDLE: begin
+//                mux_idi = 0;
+//                mux_wdi = 0;
+//                mac_load = 1;
+//                ready = 0;
+//            end
+        
+//            MAC0: begin 
+//                mux_idi = ridi_0; 
+//                mux_wdi = wdi_0;
+//                mac_load = 0; 
+//                ready = 0;
+//            end 
+//            MAC1: begin
+//                mux_idi = ridi_1; 
+//                mux_wdi = wdi_1; 
+//                mac_load = 0; 
+//                ready = 0;
+//            end 
+//            MAC2: begin 
+//                mux_idi = ridi_2; 
+//                mux_wdi = wdi_2; 
+//                mac_load = 0; 
+//                ready = 1;
+//            end 
+//            default: begin 
+//                mux_idi = 0; 
+//                mux_wdi = 0; 
+//                mac_load = 0; 
+//                ready = 0;
+//            end
+//        endcase
+//    end
     always @(*) begin
+        // Giá trị mặc định
+        mux_idi = 0;
+        mux_wdi = 0;
+        mac_load = 0;
+        ready = 0;
+        
         case(state)
             IDLE: begin
-                mux_idi = 0;
-                mux_wdi = 0;
                 mac_load = 1;
-                ready = 0;
             end
-        
-            MAC0: begin 
+            PIPE1: begin 
                 mux_idi = ridi_0; 
                 mux_wdi = wdi_0;
-                mac_load = 0; 
-                ready = 0;
             end 
-            MAC1: begin
+            PIPE2: begin
                 mux_idi = ridi_1; 
                 mux_wdi = wdi_1; 
-                mac_load = 0; 
-                ready = 0;
             end 
-            MAC2: begin 
+            MAC0: begin 
                 mux_idi = ridi_2; 
                 mux_wdi = wdi_2; 
-                mac_load = 0; 
-                ready = 1;
             end 
-            default: begin 
-                mux_idi = 0; 
-                mux_wdi = 0; 
-                mac_load = 0; 
-                ready = 0;
+            MAC1: begin
+                // Đứng chờ, MUX tự bằng 0
             end
+            MAC2: begin 
+                ready = 1; // Báo cờ hoàn thành
+            end 
+            default: ;
         endcase
     end
-
     wire signed [9:0] idi_add_off = $signed(mux_idi) + $signed(input_offset[8:0]);
 
     wire idi_sign = idi_add_off[9];
@@ -106,17 +142,68 @@ module accel_mac(
     wire [7:0] us_wdi    = wdi_sign ? (~mux_wdi + 1'b1) : mux_wdi;
     
     wire [15:0] prod;
-    M8_CP24_6 mult (
-        .A(us_idi),
-        .B(us_wdi),
+    reg [7:0]  us_idi_pipe, us_wdi_pipe;
+    reg        prod_sign_pipe1, prod_sign_pipe2;
+    reg [15:0] prod_pipe;
+    
+    always @(posedge clk) begin
+        if (!rstn) begin
+            us_idi_pipe <= 0;
+            us_wdi_pipe <= 0;
+            prod_sign_pipe1 <= 0;
+            prod_sign_pipe2 <= 0;
+            prod_pipe <= 0;
+        end else if (enb) begin
+            us_idi_pipe <= us_idi; 
+            us_wdi_pipe <= us_wdi;
+            prod_sign_pipe1 <= idi_sign ^ wdi_sign;
+            
+            prod_pipe <= prod;
+            prod_sign_pipe2 <= prod_sign_pipe1; 
+        end
+    end
+    M8_CP13_6 mult (
+        .A(us_idi_pipe),
+        .B(us_wdi_pipe),
         .P(prod)
     );
 
-    wire prod_sign = idi_sign ^ wdi_sign;
-    wire signed [31:0] final_prod = prod_sign ? -$signed({16'd0, prod}) : $signed({16'd0, prod});
+    //wire prod_sign = idi_sign ^ wdi_sign;
+    //wire signed [31:0] final_prod = prod_sign ? -$signed({16'd0, prod}) : $signed({16'd0, prod});
+    wire signed [31:0] final_prod = prod_sign_pipe2 ? -$signed({16'd0, prod_pipe}) : $signed({16'd0, prod_pipe});
 
     reg [31:0] acc;
     
+//    always @(posedge clk) begin
+//        if (!rstn) begin
+//            state <= IDLE;
+//            acc <= 32'd0;
+//            mac_odo <= 32'd0;
+//        end else if (enb) begin
+//            case (state)
+//                IDLE: begin
+//                    state <= MAC0;
+//                    mac_odo <= 0;
+//                end
+                
+//                MAC0: begin
+//                    acc <= final_prod;
+//                    state <= MAC1;
+//                end
+                
+//                MAC1: begin
+//                    acc <= acc + final_prod;
+//                    state <= MAC2;
+//                end
+                
+//                MAC2: begin
+//                    mac_odo <= acc + final_prod;
+//                    state <= IDLE;
+//                end
+//            endcase
+//        end
+//    end
+// Chuyển trạng thái FSM và Cộng tích lũy
     always @(posedge clk) begin
         if (!rstn) begin
             state <= IDLE;
@@ -125,24 +212,28 @@ module accel_mac(
         end else if (enb) begin
             case (state)
                 IDLE: begin
-                    state <= MAC0;
+                    state <= PIPE1;
                     mac_odo <= 0;
                 end
-                
+                PIPE1: begin
+                    state <= PIPE2;
+                end
+                PIPE2: begin
+                    state <= MAC0;
+                end
                 MAC0: begin
-                    acc <= final_prod;
+                    acc <= final_prod; // Lưu tích của cặp 0
                     state <= MAC1;
                 end
-                
                 MAC1: begin
-                    acc <= acc + final_prod;
+                    acc <= acc + final_prod; // Cộng tích của cặp 1
                     state <= MAC2;
                 end
-                
                 MAC2: begin
-                    mac_odo <= acc + final_prod;
+                    mac_odo <= acc + final_prod; // Cộng tích của cặp 2 và chốt ODO
                     state <= IDLE;
                 end
+                default: state <= IDLE;
             endcase
         end
     end
