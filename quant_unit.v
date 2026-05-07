@@ -55,8 +55,8 @@ module quant_unit(
     wire [63:0] quant_udi;
     reg [31:0] quant_di_reg;
     
-    reg quant_sdi_pipe;
-    reg valid_pipe;
+//    reg quant_sdi_pipe;
+//    reg valid_pipe;
     
     reg [63:0] quant_mul_result;
     reg [63:0] quant_mul_acc;
@@ -88,7 +88,8 @@ module quant_unit(
                STAGE5 = 4'd5,
                STAGE6 = 4'd6,
                STAGE7 = 4'd7,
-               STAGE8 = 4'd8;
+               STAGE8 = 4'd8,
+               STAGE9 = 4'd9;
 
     always @(posedge clk) begin
         if (!resetn) 
@@ -103,7 +104,8 @@ module quant_unit(
                 STAGE5 : state <= STAGE6;
                 STAGE6 : state <= STAGE7;
                 STAGE7 : state <= STAGE8;
-                STAGE8 : state <= LOAD;
+                STAGE8 : state <= STAGE9;
+                STAGE9 : state <= LOAD;
                 default : state <= LOAD;
             endcase
         end
@@ -193,20 +195,20 @@ module quant_unit(
     always @(posedge clk) begin
         if (!resetn) begin
             quant_shift_result <= 0;
-            quant_sdi_pipe <= 0;    // Reset thanh ghi dấu
-            valid_pipe <= 0;        // Reset thanh ghi valid
+//            quant_sdi_pipe <= 0;    // Reset thanh ghi dấu
+//            valid_pipe <= 0;        // Reset thanh ghi valid
         end 
         else if (enb) begin
             quant_shift_result <= (remainder > threshold) ? ((quant_himul_result >> quant_rshift) + 1) : (quant_himul_result >> quant_rshift);           
-            quant_sdi_pipe <= quant_sdi;          
-            valid_pipe <= (state == STAGE8); 
+//            quant_sdi_pipe <= quant_sdi;          
+//            valid_pipe <= (state == STAGE8); 
         end
     end
     //assign quant_shift_result = (remainder > threshold) ? ((quant_himul_result >> quant_rshift) + 1) : (quant_himul_result >> quant_rshift);
 
     // Output value
-//    assign quant_do = (quant_sdi) ? ~quant_shift_result + 1 : quant_shift_result;
+    assign quant_do = (quant_sdi) ? ~quant_shift_result + 1 : quant_shift_result;
 //    assign valid = (state == STAGE8);
-    assign quant_do = (quant_sdi_pipe) ? ~quant_shift_result + 1 : quant_shift_result;
-    assign valid = valid_pipe;
+ //   assign quant_do = (quant_sdi_pipe) ? ~quant_shift_result + 1 : quant_shift_result;
+    assign valid = (state == STAGE9);
 endmodule
