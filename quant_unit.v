@@ -204,11 +204,11 @@ module quant_unit(
 //            valid_pipe <= (state == STAGE8); 
         end
     end
-    //assign quant_shift_result = (remainder > threshold) ? ((quant_himul_result >> quant_rshift) + 1) : (quant_himul_result >> quant_rshift);
+   // assign quant_shift_result = (remainder > threshold) ? ((quant_himul_result >> quant_rshift) + 1) : (quant_himul_result >> quant_rshift);
 
     // Output value
     assign quant_do = (quant_sdi) ? ~quant_shift_result + 1 : quant_shift_result;
-//    assign valid = (state == STAGE8);
+    //assign valid = (state == STAGE8);
  //   assign quant_do = (quant_sdi_pipe) ? ~quant_shift_result + 1 : quant_shift_result;
     assign valid = (state == STAGE9);
 endmodule

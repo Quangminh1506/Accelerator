@@ -122,6 +122,9 @@ module flow_ctrl_read(
     //state defines
     reg [3:0] read_g_state, read_weight_state, read_input_state;
     
+    reg [31:0] mem_read_addr_comb;
+    reg mem_read_enb_comb;
+    
     //define coor
     reg [15:0] x_in, y_in, x_out; //y_out;
     reg [15:0] z_kw_in, z_kw_num_out;
@@ -910,7 +913,7 @@ module flow_ctrl_read(
                                         x_in <= 0;
                                         y_in <= 0;
                                         z_kw_in <= z_kw_in + 1;
-                                        i_addr_block_start <= i_base_addr + in2D_size;
+                                        i_addr_block_start <= i_addr_block_start + in2D_size;
                                         i_addr0_0 <= i_addr_block_start + in2D_size;
                                         //i_addr0_0 <= i_base_addr + (z_kw_in + 1) * in2D_size;
                                     end
@@ -1026,8 +1029,8 @@ module flow_ctrl_read(
     
     //output signal      
     always @* begin
-        mem_read_enb = 0;
-        mem_read_addr = 0;
+        mem_read_enb_comb = 0;
+        mem_read_addr_comb = 0;
         
         wbuf_enb = 0;
         wbuf_bank_sel = 0;
@@ -1067,84 +1070,84 @@ module flow_ctrl_read(
             CONV: begin
                 case (read_g_state) 
                     GL_WREAD: begin
-                        mem_read_enb = 1;
+                        mem_read_enb_comb = 1;
                             case (cnt) 
                                 4'd0: begin
                                    case (read_weight_state)
-                                       WREAD_0: mem_read_addr = kw_addr0_0;
-                                       WREAD_1: mem_read_addr = kw_addr0_1;
-                                       WREAD_2: mem_read_addr = kw_addr0_2;
+                                       WREAD_0: mem_read_addr_comb = kw_addr0_0;
+                                       WREAD_1: mem_read_addr_comb = kw_addr0_1;
+                                       WREAD_2: mem_read_addr_comb = kw_addr0_2;
                                    endcase
                                 end
                                 
                                 4'd1: begin
                                    case (read_weight_state)
-                                       WREAD_0: mem_read_addr = kw_addr0_0 + 4;
-                                       WREAD_1: mem_read_addr = kw_addr0_1 + 4;
-                                       WREAD_2: mem_read_addr = kw_addr0_2 + 4;
+                                       WREAD_0: mem_read_addr_comb = kw_addr0_0 + 4;
+                                       WREAD_1: mem_read_addr_comb = kw_addr0_1 + 4;
+                                       WREAD_2: mem_read_addr_comb = kw_addr0_2 + 4;
                                    endcase
                                 end
                                 
                                 4'd2: begin
                                    case (read_weight_state)
-                                       WREAD_0: mem_read_addr = kw_addr0_0 + 8;
-                                       WREAD_1: mem_read_addr = kw_addr0_1 + 8;
-                                       WREAD_2: mem_read_addr = kw_addr0_2 + 8;
+                                       WREAD_0: mem_read_addr_comb = kw_addr0_0 + 8;
+                                       WREAD_1: mem_read_addr_comb = kw_addr0_1 + 8;
+                                       WREAD_2: mem_read_addr_comb = kw_addr0_2 + 8;
                                    endcase
                                 end
                                 
                                 4'd3: begin
                                    case (read_weight_state)
-                                       WREAD_0: mem_read_addr = kw_addr1_0;
-                                       WREAD_1: mem_read_addr = kw_addr1_1;
-                                       WREAD_2: mem_read_addr = kw_addr1_2;
+                                       WREAD_0: mem_read_addr_comb = kw_addr1_0;
+                                       WREAD_1: mem_read_addr_comb = kw_addr1_1;
+                                       WREAD_2: mem_read_addr_comb = kw_addr1_2;
                                    endcase
                                 end
                                 
                                 4'd4: begin
                                    case (read_weight_state)
-                                       WREAD_0: mem_read_addr = kw_addr1_0 + 4;
-                                       WREAD_1: mem_read_addr = kw_addr1_1 + 4;
-                                       WREAD_2: mem_read_addr = kw_addr1_2 + 4;
+                                       WREAD_0: mem_read_addr_comb = kw_addr1_0 + 4;
+                                       WREAD_1: mem_read_addr_comb = kw_addr1_1 + 4;
+                                       WREAD_2: mem_read_addr_comb = kw_addr1_2 + 4;
                                    endcase
                                 end
                                 
                                 4'd5: begin
                                    case (read_weight_state)
-                                       WREAD_0: mem_read_addr = kw_addr1_0 + 8;
-                                       WREAD_1: mem_read_addr = kw_addr1_1 + 8;
-                                       WREAD_2: mem_read_addr = kw_addr1_2 + 8;
+                                       WREAD_0: mem_read_addr_comb = kw_addr1_0 + 8;
+                                       WREAD_1: mem_read_addr_comb = kw_addr1_1 + 8;
+                                       WREAD_2: mem_read_addr_comb = kw_addr1_2 + 8;
                                    endcase
                                 end
                                 
                                 4'd6: begin
                                    case (read_weight_state)
-                                       WREAD_0: mem_read_addr = kw_addr2_0;
-                                       WREAD_1: mem_read_addr = kw_addr2_1;
-                                       WREAD_2: mem_read_addr = kw_addr2_2;
+                                       WREAD_0: mem_read_addr_comb = kw_addr2_0;
+                                       WREAD_1: mem_read_addr_comb = kw_addr2_1;
+                                       WREAD_2: mem_read_addr_comb = kw_addr2_2;
                                    endcase
                                 end
                                 
                                 4'd7: begin
                                    case (read_weight_state)
-                                       WREAD_0: mem_read_addr = kw_addr2_0 + 4;
-                                       WREAD_1: mem_read_addr = kw_addr2_1 + 4;
-                                       WREAD_2: mem_read_addr = kw_addr2_2 + 4;
+                                       WREAD_0: mem_read_addr_comb = kw_addr2_0 + 4;
+                                       WREAD_1: mem_read_addr_comb = kw_addr2_1 + 4;
+                                       WREAD_2: mem_read_addr_comb = kw_addr2_2 + 4;
                                    endcase
                                 end
                                 
                                 4'd8: begin
                                    case (read_weight_state)
-                                       WREAD_0: mem_read_addr = kw_addr2_0 + 8;
-                                       WREAD_1: mem_read_addr = kw_addr2_1 + 8;
-                                       WREAD_2: mem_read_addr = kw_addr2_2 + 8;
+                                       WREAD_0: mem_read_addr_comb = kw_addr2_0 + 8;
+                                       WREAD_1: mem_read_addr_comb = kw_addr2_1 + 8;
+                                       WREAD_2: mem_read_addr_comb = kw_addr2_2 + 8;
                                    endcase
                                 end
                             endcase
 
                         if (mem_read_state) begin                            
                             if (mem_read_ready) begin
-                                mem_read_enb = 0;
+                                mem_read_enb_comb = 0;
                                 case (cnt) 
                                     4'd0: begin
                                         wbuf_enb[0] = 1;
@@ -1283,16 +1286,16 @@ module flow_ctrl_read(
                     end
                     
                     GL_BPREAD: begin
-                        mem_read_enb = 1;
+                        mem_read_enb_comb = 1;
                         case (cnt) 
-                            4'd0: mem_read_addr = bp_addr0;
-                            4'd1: mem_read_addr = bp_addr0 + 4;
-                            4'd2: mem_read_addr = bp_addr0 + 8;
+                            4'd0: mem_read_addr_comb = bp_addr0;
+                            4'd1: mem_read_addr_comb = bp_addr0 + 4;
+                            4'd2: mem_read_addr_comb = bp_addr0 + 8;
                         endcase
                         
                         if (mem_read_state) begin
                             if (mem_read_ready) begin
-                                mem_read_enb = 0;
+                                mem_read_enb_comb = 0;
                                 case (cnt)
                                     4'd0: begin
                                         bpbuf_enb[0] = 1;
@@ -1314,16 +1317,16 @@ module flow_ctrl_read(
                     end
                     
                     GL_PSREAD: begin
-                        mem_read_enb = 1;
+                        mem_read_enb_comb = 1;
                         case (cnt) 
-                            4'd0: mem_read_addr = ps_addr0;
-                            4'd1: mem_read_addr = ps_addr1;
-                            4'd2: mem_read_addr = ps_addr2;
+                            4'd0: mem_read_addr_comb = ps_addr0;
+                            4'd1: mem_read_addr_comb = ps_addr1;
+                            4'd2: mem_read_addr_comb = ps_addr2;
                         endcase
                         
                         if (mem_read_state) begin
                             if (mem_read_ready) begin
-                                mem_read_enb = 0;
+                                mem_read_enb_comb = 0;
                                 case (cnt)
                                     4'd0: begin
                                         bpbuf_enb[0] = 1;
@@ -1352,85 +1355,85 @@ module flow_ctrl_read(
                     end
                     
                     GL_IREAD: begin
-                        mem_read_enb = 1;
+                        mem_read_enb_comb = 1;
                         case (read_input_state)
                             I_BEGIN: begin
                                 case (cnt)
-                                    5'd0: mem_read_addr = i_addr0_0;
-                                    5'd1: mem_read_addr = i_addr0_0 + 4;
-                                    5'd2: mem_read_addr = i_addr0_1;
-                                    5'd3: mem_read_addr = i_addr0_1 + 4;
-                                    5'd4: mem_read_addr = i_addr0_2;
-                                    5'd5: mem_read_addr = i_addr0_2 + 4;
-                                    5'd6: mem_read_addr = i_addr1_0;
-                                    5'd7: mem_read_addr = i_addr1_0 + 4;
-                                    5'd8: mem_read_addr = i_addr1_1;
-                                    5'd9: mem_read_addr = i_addr1_1 + 4;
-                                    5'd10: mem_read_addr = i_addr1_2;
-                                    5'd11: mem_read_addr = i_addr1_2 + 4;
-                                    5'd12: mem_read_addr = i_addr2_0;
-                                    5'd13: mem_read_addr = i_addr2_0 + 4;
-                                    5'd14: mem_read_addr = i_addr2_1;
-                                    5'd15: mem_read_addr = i_addr2_1 + 4;
-                                    5'd16: mem_read_addr = i_addr2_2;
-                                    5'd17: mem_read_addr = i_addr2_2 + 4;
+                                    5'd0: mem_read_addr_comb = i_addr0_0;
+                                    5'd1: mem_read_addr_comb = i_addr0_0 + 4;
+                                    5'd2: mem_read_addr_comb = i_addr0_1;
+                                    5'd3: mem_read_addr_comb = i_addr0_1 + 4;
+                                    5'd4: mem_read_addr_comb = i_addr0_2;
+                                    5'd5: mem_read_addr_comb = i_addr0_2 + 4;
+                                    5'd6: mem_read_addr_comb = i_addr1_0;
+                                    5'd7: mem_read_addr_comb = i_addr1_0 + 4;
+                                    5'd8: mem_read_addr_comb = i_addr1_1;
+                                    5'd9: mem_read_addr_comb = i_addr1_1 + 4;
+                                    5'd10: mem_read_addr_comb = i_addr1_2;
+                                    5'd11: mem_read_addr_comb = i_addr1_2 + 4;
+                                    5'd12: mem_read_addr_comb = i_addr2_0;
+                                    5'd13: mem_read_addr_comb = i_addr2_0 + 4;
+                                    5'd14: mem_read_addr_comb = i_addr2_1;
+                                    5'd15: mem_read_addr_comb = i_addr2_1 + 4;
+                                    5'd16: mem_read_addr_comb = i_addr2_2;
+                                    5'd17: mem_read_addr_comb = i_addr2_2 + 4;
                                 endcase
                             end
                                 
                             I_LEFT: begin
                                 case (cnt) 
-                                    5'd0: mem_read_addr = i_sl_addr0_0;
-                                    5'd1: mem_read_addr = i_sl_addr0_1;
-                                    5'd2: mem_read_addr = i_sl_addr0_2;
-                                    5'd3: mem_read_addr = i_sl_addr1_0;
-                                    5'd4: mem_read_addr = i_sl_addr1_1;
-                                    5'd5: mem_read_addr = i_sl_addr1_2;
-                                    5'd6: mem_read_addr = i_sl_addr2_0;
-                                    5'd7: mem_read_addr = i_sl_addr2_1;
-                                    5'd8: mem_read_addr = i_sl_addr2_2;
+                                    5'd0: mem_read_addr_comb = i_sl_addr0_0;
+                                    5'd1: mem_read_addr_comb = i_sl_addr0_1;
+                                    5'd2: mem_read_addr_comb = i_sl_addr0_2;
+                                    5'd3: mem_read_addr_comb = i_sl_addr1_0;
+                                    5'd4: mem_read_addr_comb = i_sl_addr1_1;
+                                    5'd5: mem_read_addr_comb = i_sl_addr1_2;
+                                    5'd6: mem_read_addr_comb = i_sl_addr2_0;
+                                    5'd7: mem_read_addr_comb = i_sl_addr2_1;
+                                    5'd8: mem_read_addr_comb = i_sl_addr2_2;
                                 endcase
                             end
                                 
                             I_DOWN_LEFT_RIGHT: begin
                                 case (cnt)
-                                    5'd0: mem_read_addr = i_sdlr_addr0;
-                                    5'd1: mem_read_addr = i_sdlr_addr0 + 4;
-                                    5'd2: mem_read_addr = i_sdlr_addr1;
-                                    5'd3: mem_read_addr = i_sdlr_addr1 + 4;
-                                    5'd4: mem_read_addr = i_sdlr_addr2;
-                                    5'd5: mem_read_addr = i_sdlr_addr2 + 4;
+                                    5'd0: mem_read_addr_comb = i_sdlr_addr0;
+                                    5'd1: mem_read_addr_comb = i_sdlr_addr0 + 4;
+                                    5'd2: mem_read_addr_comb = i_sdlr_addr1;
+                                    5'd3: mem_read_addr_comb = i_sdlr_addr1 + 4;
+                                    5'd4: mem_read_addr_comb = i_sdlr_addr2;
+                                    5'd5: mem_read_addr_comb = i_sdlr_addr2 + 4;
                                 endcase
                             end
                                 
                             I_RIGHT: begin
                                 case (cnt) 
-                                    5'd0: mem_read_addr = i_sr_addr0_0;
-                                    5'd1: mem_read_addr = i_sr_addr0_1;
-                                    5'd2: mem_read_addr = i_sr_addr0_2;
-                                    5'd3: mem_read_addr = i_sr_addr1_0;
-                                    5'd4: mem_read_addr = i_sr_addr1_1;
-                                    5'd5: mem_read_addr = i_sr_addr1_2;
-                                    5'd6: mem_read_addr = i_sr_addr2_0;
-                                    5'd7: mem_read_addr = i_sr_addr2_1;
-                                    5'd8: mem_read_addr = i_sr_addr2_2;
+                                    5'd0: mem_read_addr_comb = i_sr_addr0_0;
+                                    5'd1: mem_read_addr_comb = i_sr_addr0_1;
+                                    5'd2: mem_read_addr_comb = i_sr_addr0_2;
+                                    5'd3: mem_read_addr_comb = i_sr_addr1_0;
+                                    5'd4: mem_read_addr_comb = i_sr_addr1_1;
+                                    5'd5: mem_read_addr_comb = i_sr_addr1_2;
+                                    5'd6: mem_read_addr_comb = i_sr_addr2_0;
+                                    5'd7: mem_read_addr_comb = i_sr_addr2_1;
+                                    5'd8: mem_read_addr_comb = i_sr_addr2_2;
                                 endcase
                             end
                                 
                             I_DOWN_RIGHT_LEFT: begin
                                 case (cnt)
-                                    5'd0: mem_read_addr = i_sdrl_addr0;
-                                    5'd1: mem_read_addr = i_sdrl_addr0 - 4;
-                                    5'd2: mem_read_addr = i_sdrl_addr1;
-                                    5'd3: mem_read_addr = i_sdrl_addr1 - 4;
-                                    5'd4: mem_read_addr = i_sdrl_addr2;
-                                    5'd5: mem_read_addr = i_sdrl_addr2 - 4;
+                                    5'd0: mem_read_addr_comb = i_sdrl_addr0;
+                                    5'd1: mem_read_addr_comb = i_sdrl_addr0 - 4;
+                                    5'd2: mem_read_addr_comb = i_sdrl_addr1;
+                                    5'd3: mem_read_addr_comb = i_sdrl_addr1 - 4;
+                                    5'd4: mem_read_addr_comb = i_sdrl_addr2;
+                                    5'd5: mem_read_addr_comb = i_sdrl_addr2 - 4;
                                 endcase
                             end
                         endcase
 
                         if (mem_read_state) begin
                             if (mem_read_ready) begin
-                                mem_read_enb = 0;
+                                mem_read_enb_comb = 0;
                                 case (read_input_state)
                                     I_BEGIN: begin
                                         case (cnt) 
@@ -1879,15 +1882,15 @@ module flow_ctrl_read(
             POOLING: begin
                 case (read_g_state)
                     GL_IREAD: begin
-                        mem_read_enb = 1;
+                        mem_read_enb_comb = 1;
                         case (cnt)
-                            5'd0: mem_read_addr = i_p_addr0;
-                            5'd1: mem_read_addr = i_p_addr1;
-                            5'd2: mem_read_addr = i_p_addr2;
+                            5'd0: mem_read_addr_comb = i_p_addr0;
+                            5'd1: mem_read_addr_comb = i_p_addr1;
+                            5'd2: mem_read_addr_comb = i_p_addr2;
                         endcase
                         if (mem_read_state) begin
                             if (mem_read_ready) begin
-                                mem_read_enb = 0;
+                                mem_read_enb_comb = 0;
                                 case (cnt) 
                                     5'd0: begin
                                         ibuf_enb[0] = 1;
@@ -1937,15 +1940,15 @@ module flow_ctrl_read(
             DENSE: begin
                 case (read_g_state) 
                     GL_IREAD: begin
-                        mem_read_enb = 1;
+                        mem_read_enb_comb = 1;
                         case (cnt) 
-                            4'd0: mem_read_addr = i_addr0_0;
-                            4'd1: mem_read_addr = i_addr0_0 + 4;
-                            4'd2: mem_read_addr = i_addr0_0 + 8;
+                            4'd0: mem_read_addr_comb = i_addr0_0;
+                            4'd1: mem_read_addr_comb = i_addr0_0 + 4;
+                            4'd2: mem_read_addr_comb = i_addr0_0 + 8;
                         endcase
                         if (mem_read_state) begin
                             if (mem_read_ready) begin
-                                mem_read_enb = 0;
+                                mem_read_enb_comb = 0;
                                 ibuf_enb[0] = 1;
                                 ibuf_ld[0] = 1;
                                 case (cnt) 
@@ -1991,15 +1994,15 @@ module flow_ctrl_read(
                     end
 
                     GL_BPREAD: begin
-                        mem_read_enb = 1;
+                        mem_read_enb_comb = 1;
                         case (cnt) 
-                            4'd0: mem_read_addr = bp_addr0;
-                            4'd1: mem_read_addr = bp_addr0 + 4;
-                            4'd2: mem_read_addr = bp_addr0 + 8;
+                            4'd0: mem_read_addr_comb = bp_addr0;
+                            4'd1: mem_read_addr_comb = bp_addr0 + 4;
+                            4'd2: mem_read_addr_comb = bp_addr0 + 8;
                         endcase
                         if (mem_read_state) begin
                             if (mem_read_ready) begin
-                                mem_read_enb = 0;
+                                mem_read_enb_comb = 0;
                                 case (cnt) 
                                     4'd0: begin
                                         bpbuf_enb[0] = 1;
@@ -2021,15 +2024,15 @@ module flow_ctrl_read(
                     end
 
                     GL_PSREAD: begin
-                        mem_read_enb = 1;
+                        mem_read_enb_comb = 1;
                         case (cnt) 
-                            4'd0: mem_read_addr = ps_addr0;
-                            4'd1: mem_read_addr = ps_addr0 + 4;
-                            4'd2: mem_read_addr = ps_addr0 + 8;
+                            4'd0: mem_read_addr_comb = ps_addr0;
+                            4'd1: mem_read_addr_comb = ps_addr0 + 4;
+                            4'd2: mem_read_addr_comb = ps_addr0 + 8;
                         endcase
                         if (mem_read_state) begin
                             if (mem_read_ready) begin
-                                mem_read_enb = 0;
+                                mem_read_enb_comb = 0;
                                 case (cnt) 
                                     4'd0: begin
                                         bpbuf_enb[0] = 1;
@@ -2058,21 +2061,21 @@ module flow_ctrl_read(
                     end
                     
                     GL_WREAD: begin
-                        mem_read_enb = 1;
+                        mem_read_enb_comb = 1;
                         case (cnt)
-                            4'd0: mem_read_addr = kw_addr0_0;
-                            4'd1: mem_read_addr = kw_addr0_0 + 4;
-                            4'd2: mem_read_addr = kw_addr0_0 + 8;
-                            4'd3: mem_read_addr = kw_addr1;
-                            4'd4: mem_read_addr = kw_addr1 + 4;
-                            4'd5: mem_read_addr = kw_addr1 + 8;
-                            4'd6: mem_read_addr = kw_addr2;
-                            4'd7: mem_read_addr = kw_addr2 + 4;
-                            4'd8: mem_read_addr = kw_addr2 + 8;
+                            4'd0: mem_read_addr_comb = kw_addr0_0;
+                            4'd1: mem_read_addr_comb = kw_addr0_0 + 4;
+                            4'd2: mem_read_addr_comb = kw_addr0_0 + 8;
+                            4'd3: mem_read_addr_comb = kw_addr1;
+                            4'd4: mem_read_addr_comb = kw_addr1 + 4;
+                            4'd5: mem_read_addr_comb = kw_addr1 + 8;
+                            4'd6: mem_read_addr_comb = kw_addr2;
+                            4'd7: mem_read_addr_comb = kw_addr2 + 4;
+                            4'd8: mem_read_addr_comb = kw_addr2 + 8;
                         endcase
                         if (mem_read_state) begin
                             if (mem_read_ready) begin
-                                mem_read_enb = 0;
+                                mem_read_enb_comb = 0;
                                 case (cnt)
                                     4'd0: begin
                                         wbuf_enb[0] = 1;
@@ -2402,5 +2405,14 @@ module flow_ctrl_read(
             end
         end    
     end
-
+    
+    always @(posedge clk) begin
+        if (!resetn) begin
+            mem_read_addr <= 0;
+            mem_read_enb  <= 0;
+        end else begin
+            mem_read_addr <= mem_read_addr_comb;
+            mem_read_enb  <= mem_read_enb_comb;
+        end
+    end
 endmodule
